@@ -35,8 +35,23 @@ const commandCategories = {
     title: "🎮 Fun Commands",
     commands: [
       { name: "/meme", description: "Get a random meme" },
+      { name: "/waifu", description: "Get a random anime image" },
       { name: "/nsfw", description: "Get NSFW images (NSFW channels only)" },
       { name: "/nsfwmenu", description: "Create NSFW image menu with buttons" },
+    ],
+  },
+  actions: {
+    title: "🎭 Action Commands",
+    commands: [
+      { name: "/kiss", description: "Kiss someone! 😘" },
+      { name: "/hug", description: "Give someone a big hug! 🤗" },
+      { name: "/pat", description: "Pat someone on the head! 💆" },
+      { name: "/slap", description: "Slap someone! 👋" },
+      { name: "/poke", description: "Poke someone! 👉" },
+      { name: "/cuddle", description: "Cuddle with someone! 🧸" },
+      { name: "/cry", description: "Express sadness... 😢" },
+      { name: "/smile", description: "Show a smile! 😄" },
+      { name: "/kill", description: "Kill someone (playfully) 🔪" },
     ],
   },
   utility: {
@@ -74,6 +89,7 @@ export default {
         },
         { name: "📊 Leveling", value: "Voice ranking commands", inline: true },
         { name: "🎮 Fun", value: "Entertainment commands", inline: true },
+        { name: "🎭 Actions", value: "Social interactions", inline: true },
         { name: "🎵 Music", value: "YouTube music player", inline: true },
         { name: "🔧 Utility", value: "Information commands", inline: true },
       ],
