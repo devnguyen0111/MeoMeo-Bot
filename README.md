@@ -1,6 +1,6 @@
 # MeoMeo Discord Bot
 
-A feature-rich Discord bot for single-server use with voice-based leveling, economy system, moderation tools, and fun commands. Built with Discord.js v14 and MongoDB, featuring interactive Discord Components v2 (Buttons, Select Menus, Modals).
+A feature-rich Discord bot for single-server use with voice-based leveling, economy system, moderation tools, YouTube music player, and fun commands. Built with Discord.js v14 and MongoDB, featuring interactive Discord Components v2 (Buttons, Select Menus, Modals).
 
 ## ✨ Features
 
@@ -25,12 +25,27 @@ A feature-rich Discord bot for single-server use with voice-based leveling, econ
 
 ### 🎮 Fun Commands
 - `/meme` - Random memes with next button
+- `/nsfw` - NSFW images from various types (NSFW channels only)
+- `/nsfwmenu` - Create sticky NSFW menu with interactive buttons
+
+### 🎵 Music System
+- `/play` - Play songs from YouTube (URL or search)
+- `/pause` - Pause playback
+- `/resume` - Resume playback
+- `/skip` - Skip songs (with amount option)
+- `/stop` - Stop and clear queue
+- `/queue` - View current queue
+- `/nowplaying` - Show current song info
+- `/volume` - Adjust volume (1-100)
+- Auto-disconnect after inactivity
+- Queue management with loop modes
 
 ### 🔧 Utility
 - `/ping` - Check bot and API latency
 - `/help` - Interactive help menu with category selection
 - `/serverinfo` - Detailed server information
 - `/userinfo` - User information with bot stats integration
+- `/avatar` - Display user avatar with size options
 
 ## 🚀 Setup
 
@@ -155,12 +170,13 @@ export default {
 
 | Category | Commands | Count |
 |----------|----------|-------|
-| Moderation | kick, ban, mute, clear | 4 |
+| Moderation | kick, ban, mute, warn, clear | 5 |
 | Economy | balance, daily, transfer, shop | 4 |
 | Leveling | rank, leaderboard, voicetime | 3 |
-| Fun | meme | 1 |
-| Utility | ping, help, serverinfo, userinfo | 4 |
-| **Total** | | **16** |
+| Fun | meme, nsfw, nsfwmenu | 3 |
+| Music | play, pause, resume, skip, stop, queue, nowplaying, volume | 8 |
+| Utility | ping, help, serverinfo, userinfo, avatar | 5 |
+| **Total** | | **28** |
 
 ## 🤝 Contributing
 
