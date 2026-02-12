@@ -31,22 +31,12 @@ function getDayDiff(from, to) {
   return Math.floor(diffMs / MS_PER_DAY);
 }
 
-function getTimeUntilNextDay(now) {
-  const offset = getOffsetDate(now);
-  const nextDay = new Date(
-    Date.UTC(
-      offset.getUTCFullYear(),
-      offset.getUTCMonth(),
-      offset.getUTCDate() + 1,
-    ),
-  );
-  return Math.max(0, nextDay - offset);
-}
-
-function formatTimeRemaining(ms) {
-  const hours = Math.floor(ms / (1000 * 60 * 60));
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  return `${hours}h ${minutes}m`;
+function getDateKey(date) {
+  const offset = getOffsetDate(date);
+  const year = offset.getUTCFullYear();
+  const month = String(offset.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(offset.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function ensureRestoreMonth(user, now) {
@@ -66,7 +56,7 @@ function getRestoresLeft(user, now) {
 
 function canClaimStreak(user, now) {
   if (!user.streakLastClaim) return true;
-  return getDayDiff(user.streakLastClaim, now) >= 1;
+  return getDateKey(user.streakLastClaim) !== getDateKey(now);
 }
 
 function applyStreakClaim(user, now) {
@@ -95,62 +85,15 @@ function applyStreakClaim(user, now) {
 }
 
 function buildStatusEmbed(user, now, canClaim) {
-  const remainingMs = getTimeUntilNextDay(now);
   const description = canClaim
     ? "Click the button below to claim your streak."
-    : `You've already claimed today!\nCome back in **${formatTimeRemaining(remainingMs)}**`;
+    : "You've already claimed today!\nCome back tomorrow.";
 
   return infoEmbed(
     "Streak Minigame",
     `${description}\n\nStreak: **${user.streakCount || 0}** day(s)` +
-      `\nRestores left this month: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**` +
-      `\nNext cooldown reset in: **${formatTimeRemaining(remainingMs)}**`,
+      `\nRestores left this month: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**`,
   );
-}
-
-async function scheduleStreakRefresh(message, userId, delayMs) {
-  if (delayMs <= 0) return;
-
-  setTimeout(async () => {
-    try {
-      const user = await User.findOne({ userId });
-      if (!user) return;
-
-      const now = new Date();
-      const canClaim = canClaimStreak(user, now);
-      const embed = buildStatusEmbed(user, now, canClaim);
-      const claimButton = buttons.streakClaim(canClaim, userId);
-
-      await message.edit({ embeds: [embed], components: [claimButton] });
-    } catch (error) {
-      // Ignore if message is deleted or cannot be edited
-    }
-  }, delayMs);
-}
-
-function scheduleStreakCountdown(message, userId) {
-  const interval = setInterval(async () => {
-    try {
-      const user = await User.findOne({ userId });
-      if (!user) {
-        clearInterval(interval);
-        return;
-      }
-
-      const now = new Date();
-      const canClaim = canClaimStreak(user, now);
-      const embed = buildStatusEmbed(user, now, canClaim);
-      const claimButton = buttons.streakClaim(canClaim, userId);
-
-      await message.edit({ embeds: [embed], components: [claimButton] });
-
-      if (canClaim) {
-        clearInterval(interval);
-      }
-    } catch (error) {
-      clearInterval(interval);
-    }
-  }, 30 * 1000);
 }
 
 export default {
@@ -172,16 +115,10 @@ export default {
     const embed = buildStatusEmbed(user, now, canClaim);
     const claimButton = buttons.streakClaim(canClaim, userId);
 
-    const message = await interaction.reply({
+    await interaction.reply({
       embeds: [embed],
       components: [claimButton],
-      fetchReply: true,
     });
-
-    if (!canClaim) {
-      scheduleStreakRefresh(message, userId, getTimeUntilNextDay(now));
-      scheduleStreakCountdown(message, userId);
-    }
   },
 };
 
@@ -207,13 +144,10 @@ export async function handleStreakClaim(interaction) {
     const embed = buildStatusEmbed(user, now, false);
     const claimButton = buttons.streakClaim(false, userId);
 
-    const message = await interaction.update({
+    await interaction.update({
       embeds: [embed],
       components: [claimButton],
     });
-
-    scheduleStreakRefresh(message, userId, getTimeUntilNextDay(now));
-    scheduleStreakCountdown(message, userId);
     return;
   }
 
@@ -226,16 +160,12 @@ export async function handleStreakClaim(interaction) {
     "Streak Claimed!",
     `Streak: **${user.streakCount}** day(s)` +
       `${usedRestore ? "\n🧩 Used 1 streak restore." : ""}` +
-      `\nRestores left this month: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**` +
-      `\nNext cooldown reset in: **${formatTimeRemaining(getTimeUntilNextDay(now))}**`,
+      `\nRestores left this month: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**`,
   );
 
   const claimButton = buttons.streakClaim(false, userId);
-  const message = await interaction.update({
+  await interaction.update({
     embeds: [embed],
     components: [claimButton],
   });
-
-  scheduleStreakRefresh(message, userId, getTimeUntilNextDay(now));
-  scheduleStreakCountdown(message, userId);
 }
