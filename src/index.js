@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import mongoose from "mongoose";
 import config from "../config/config.js";
 import logger from "./utils/logger.js";
+import CommandStats from "./models/CommandStats.js";
 
 dotenv.config();
 
@@ -24,6 +25,11 @@ const client = new Client({
 
 // Initialize commands collection
 client.commands = new Collection();
+client.stats = {
+  startedAt: Date.now(),
+  totalCommands: 0,
+  commandUsage: new Map(),
+};
 
 // Load commands
 async function loadCommands() {
@@ -93,6 +99,17 @@ async function connectDatabase() {
   }
 }
 
+async function loadCommandStats() {
+  const doc = await CommandStats.findOneAndUpdate(
+    { key: "global" },
+    { $setOnInsert: { key: "global" } },
+    { new: true, upsert: true },
+  );
+
+  client.stats.totalCommands = doc.totalCommands || 0;
+  client.stats.commandUsage = new Map(doc.commandUsage || []);
+}
+
 // Graceful shutdown
 function setupGracefulShutdown() {
   const shutdown = async (signal) => {
@@ -123,6 +140,9 @@ async function main() {
 
     // Connect to database
     await connectDatabase();
+
+    // Load persistent command stats
+    await loadCommandStats();
 
     // Load commands and events
     await loadCommands();

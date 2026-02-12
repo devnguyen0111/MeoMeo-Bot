@@ -14,10 +14,6 @@ export function helpCategoryMenu() {
       .setDescription("Server moderation commands")
       .setValue("moderation"),
     new StringSelectMenuOptionBuilder()
-      .setLabel("💰 Economy")
-      .setDescription("Economy and currency commands")
-      .setValue("economy"),
-    new StringSelectMenuOptionBuilder()
       .setLabel("📊 Leveling")
       .setDescription("Voice leveling and ranking commands")
       .setValue("leveling"),
@@ -38,53 +34,6 @@ export function helpCategoryMenu() {
   const selectMenu = new StringSelectMenuBuilder()
     .setCustomId("help_category")
     .setPlaceholder("Select a category to view commands")
-    .addOptions(options);
-
-  return new ActionRowBuilder().addComponents(selectMenu);
-}
-
-/**
- * Shop category selector
- */
-export function shopCategoryMenu() {
-  const options = [
-    new StringSelectMenuOptionBuilder()
-      .setLabel("🎨 Cosmetics")
-      .setDescription("Profile customization items")
-      .setValue("cosmetics"),
-    new StringSelectMenuOptionBuilder()
-      .setLabel("🏆 Boosters")
-      .setDescription("XP and economy boosters")
-      .setValue("boosters"),
-    new StringSelectMenuOptionBuilder()
-      .setLabel("🎁 Items")
-      .setDescription("Collectible items")
-      .setValue("items"),
-  ];
-
-  const selectMenu = new StringSelectMenuBuilder()
-    .setCustomId("shop_category")
-    .setPlaceholder("Select a shop category")
-    .addOptions(options);
-
-  return new ActionRowBuilder().addComponents(selectMenu);
-}
-
-/**
- * Shop items selector
- */
-export function shopItemsMenu(items, category) {
-  const options = items.map((item) =>
-    new StringSelectMenuOptionBuilder()
-      .setLabel(item.name)
-      .setDescription(`${item.price} 💰 - ${item.description}`)
-      .setValue(`${category}_${item.id}`)
-      .setEmoji(item.emoji || "📦"),
-  );
-
-  const selectMenu = new StringSelectMenuBuilder()
-    .setCustomId("shop_item")
-    .setPlaceholder("Select an item to purchase")
     .addOptions(options);
 
   return new ActionRowBuilder().addComponents(selectMenu);
@@ -137,8 +86,6 @@ export function timeDurationMenu(customId = "time_duration") {
 
 export default {
   helpCategory: helpCategoryMenu,
-  shopCategory: shopCategoryMenu,
-  shopItems: shopItemsMenu,
   custom: customSelectMenu,
   timeDuration: timeDurationMenu,
 };

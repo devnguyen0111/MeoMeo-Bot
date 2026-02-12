@@ -14,15 +14,6 @@ const commandCategories = {
       { name: "/clear", description: "Bulk delete messages" },
     ],
   },
-  economy: {
-    title: "💰 Economy Commands",
-    commands: [
-      { name: "/balance", description: "Check your or someone's balance" },
-      { name: "/daily", description: "Claim your daily reward" },
-      { name: "/transfer", description: "Transfer money to another user" },
-      { name: "/shop", description: "Browse the shop" },
-    ],
-  },
   leveling: {
     title: "📊 Leveling Commands",
     commands: [
@@ -59,6 +50,7 @@ const commandCategories = {
     title: "🔧 Utility Commands",
     commands: [
       { name: "/ping", description: "Check bot latency" },
+      { name: "/status", description: "View bot status and stats" },
       { name: "/help", description: "Show this help menu" },
       { name: "/serverinfo", description: "Get server information" },
       { name: "/userinfo", description: "Get user information" },
@@ -82,11 +74,6 @@ export default {
         {
           name: "🛡️ Moderation",
           value: "Server management commands",
-          inline: true,
-        },
-        {
-          name: "💰 Economy",
-          value: "Currency and shop commands",
           inline: true,
         },
         { name: "📊 Leveling", value: "Voice ranking commands", inline: true },

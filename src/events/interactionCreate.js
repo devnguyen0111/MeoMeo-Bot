@@ -1,5 +1,6 @@
 import { Events } from "discord.js";
 import logger from "../utils/logger.js";
+import CommandStats from "../models/CommandStats.js";
 
 export default {
   name: Events.InteractionCreate,
@@ -51,6 +52,28 @@ async function handleCommand(interaction) {
   if (!command) {
     logger.warn(`No command matching ${interaction.commandName} was found.`);
     return;
+  }
+
+  const stats = interaction.client.stats;
+  if (stats) {
+    stats.totalCommands += 1;
+    const current = stats.commandUsage.get(interaction.commandName) || 0;
+    stats.commandUsage.set(interaction.commandName, current + 1);
+
+    try {
+      await CommandStats.updateOne(
+        { key: "global" },
+        {
+          $inc: {
+            totalCommands: 1,
+            [`commandUsage.${interaction.commandName}`]: 1,
+          },
+        },
+        { upsert: true },
+      );
+    } catch (error) {
+      logger.error("Failed to persist command stats:", error);
+    }
   }
 
   try {

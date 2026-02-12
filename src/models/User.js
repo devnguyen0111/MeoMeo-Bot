@@ -35,11 +35,6 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    // Economy
-    lastDaily: {
-      type: Date,
-      default: null,
-    },
     streakLastClaim: {
       type: Date,
       default: null,
@@ -85,27 +80,6 @@ userSchema.methods.addXP = function (amount) {
   }
 
   return levelUps;
-};
-
-// Method to check if user can claim daily reward
-userSchema.methods.canClaimDaily = function () {
-  if (!this.lastDaily) return true;
-
-  const now = new Date();
-  const hoursSinceLastDaily = (now - this.lastDaily) / (1000 * 60 * 60);
-
-  return hoursSinceLastDaily >= 24;
-};
-
-// Method to get time until next daily
-userSchema.methods.getTimeUntilDaily = function () {
-  if (!this.lastDaily) return 0;
-
-  const now = new Date();
-  const hoursSinceLastDaily = (now - this.lastDaily) / (1000 * 60 * 60);
-  const hoursRemaining = Math.max(0, 24 - hoursSinceLastDaily);
-
-  return Math.ceil(hoursRemaining * 60 * 60 * 1000);
 };
 
 // Method to reset daily voice time

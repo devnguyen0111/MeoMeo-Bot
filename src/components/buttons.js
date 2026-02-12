@@ -88,21 +88,6 @@ export function actionButtons(buttons) {
 }
 
 /**
- * Daily claim button with countdown
- */
-export function dailyClaimButton(canClaim = true, userId = null) {
-  const customId = userId ? `daily_claim_${userId}` : "daily_claim";
-
-  return new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(customId)
-      .setLabel(canClaim ? "💰 Claim Daily Reward" : "⏳ Already Claimed")
-      .setStyle(canClaim ? ButtonStyle.Success : ButtonStyle.Secondary)
-      .setDisabled(!canClaim),
-  );
-}
-
-/**
  * Streak claim button
  */
 export function streakClaimButton(canClaim = true, userId = null) {
@@ -158,7 +143,6 @@ export default {
   pagination: paginationButtons,
   action: actionButton,
   actions: actionButtons,
-  dailyClaim: dailyClaimButton,
   streakClaim: streakClaimButton,
   refresh: refreshButton,
   viewLeaderboard: viewLeaderboardButton,
