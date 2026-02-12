@@ -35,6 +35,7 @@ const commandCategories = {
     title: "🎮 Fun Commands",
     commands: [
       { name: "/meme", description: "Get a random meme" },
+      { name: "/streak", description: "Play the daily streak minigame" },
       { name: "/waifu", description: "Get a random anime image" },
       { name: "/nsfw", description: "Get NSFW images (NSFW channels only)" },
       { name: "/nsfwmenu", description: "Create NSFW image menu with buttons" },
@@ -62,6 +63,7 @@ const commandCategories = {
       { name: "/serverinfo", description: "Get server information" },
       { name: "/userinfo", description: "Get user information" },
       { name: "/avatar", description: "Display user avatar" },
+      { name: "/stayvc", description: "Keep the bot in a voice channel" },
     ],
   },
 };
