@@ -1,1 +1,3 @@
-require("./src/index.js");
+import bot from "./index.js";
+
+bot();
