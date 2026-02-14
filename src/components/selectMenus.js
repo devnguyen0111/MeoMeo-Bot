@@ -26,6 +26,10 @@ export function helpCategoryMenu() {
       .setDescription("Social action commands")
       .setValue("actions"),
     new StringSelectMenuOptionBuilder()
+      .setLabel("🎵 Music")
+      .setDescription("Music playback commands")
+      .setValue("music"),
+    new StringSelectMenuOptionBuilder()
       .setLabel("🔧 Utility")
       .setDescription("Utility and information commands")
       .setValue("utility"),

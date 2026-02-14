@@ -4,11 +4,17 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose";
+import { Player } from "discord-player";
+import extractorPkg from "@discord-player/extractor";
+import { YoutubeExtractor } from "discord-player-youtube";
+import ffmpegStatic from "ffmpeg-static";
 import config from "../config/config.js";
 import logger from "./utils/logger.js";
 import CommandStats from "./models/CommandStats.js";
 
 dotenv.config();
+
+const { DefaultExtractors } = extractorPkg.default || extractorPkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +36,51 @@ client.stats = {
   totalCommands: 0,
   commandUsage: new Map(),
 };
+
+if (ffmpegStatic && !process.env.FFMPEG_PATH) {
+  process.env.FFMPEG_PATH = ffmpegStatic;
+}
+
+client.player = new Player(client);
+
+const playbackErrorCooldown = new Map();
+
+client.player.events.on("playerError", (queue, error) => {
+  logger.error(`Player error in ${queue.guild.id}:`, error);
+  const guildId = queue?.guild?.id;
+  if (!guildId) {
+    return;
+  }
+
+  const now = Date.now();
+  const lastNotice = playbackErrorCooldown.get(guildId) || 0;
+  if (now - lastNotice < 5000) {
+    return;
+  }
+
+  if (queue?.node?.isPlaying()) {
+    return;
+  }
+
+  playbackErrorCooldown.set(guildId, now);
+
+  const channel = queue?.metadata?.channel;
+  if (!channel) {
+    return;
+  }
+
+  const message = String(error?.message || error || "");
+  const requiresAuth = message.toLowerCase().includes("signed in");
+  const content = requiresAuth
+    ? "❌ This track requires a signed-in YouTube session. Please try another song or add a cookie."
+    : "❌ Failed to play this track. Please try another song.";
+
+  channel.send({ content }).catch(() => {});
+});
+
+client.player.events.on("error", (queue, error) => {
+  logger.error(`Queue error in ${queue.guild.id}:`, error);
+});
 
 // Load commands
 async function loadCommands() {
@@ -110,6 +161,25 @@ async function loadCommandStats() {
   client.stats.commandUsage = new Map(doc.commandUsage || []);
 }
 
+async function setupMusicSystem() {
+  try {
+    await client.player.extractors.loadMulti(DefaultExtractors);
+
+    try {
+      await client.player.extractors.register(YoutubeExtractor, {
+        filterAutoplayTracks: true,
+        disableYTJSLog: true,
+      });
+    } catch (error) {
+      logger.warn("Failed to register YouTube extractor:", error);
+    }
+
+    logger.success("Music system initialized");
+  } catch (error) {
+    logger.error("Failed to initialize music system:", error);
+  }
+}
+
 // Graceful shutdown
 function setupGracefulShutdown() {
   const shutdown = async (signal) => {
@@ -147,6 +217,9 @@ async function main() {
     // Load commands and events
     await loadCommands();
     await loadEvents();
+
+    // Setup music system
+    await setupMusicSystem();
 
     // Setup graceful shutdown
     setupGracefulShutdown();

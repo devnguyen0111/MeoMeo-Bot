@@ -46,6 +46,20 @@ const commandCategories = {
       { name: "/kill", description: "Kill someone (playfully) 🔪" },
     ],
   },
+  music: {
+    title: "🎵 Music Commands",
+    commands: [
+      { name: "/play", description: "Play a song or playlist" },
+      { name: "/pause", description: "Pause playback" },
+      { name: "/resume", description: "Resume playback" },
+      { name: "/skip", description: "Skip the current song" },
+      { name: "/shuffle", description: "Shuffle the queue" },
+      { name: "/stop", description: "Stop playback and clear queue" },
+      { name: "/queue", description: "View the current queue" },
+      { name: "/nowplaying", description: "Show the current song" },
+      { name: "/volume", description: "Adjust the volume" },
+    ],
+  },
   utility: {
     title: "🔧 Utility Commands",
     commands: [
