@@ -14,7 +14,7 @@ export default {
     client.user.setPresence({
       activities: [
         {
-          name: "Whatching you sleep...  💤",
+          name: "Đang canh bạn ngủ... 💤",
           type: 0, // Playing
         },
       ],

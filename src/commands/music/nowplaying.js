@@ -12,7 +12,9 @@ export default {
 
     if (!queue?.currentTrack) {
       await interaction.reply({
-        embeds: [errorEmbed("Nothing Playing", "There is no song playing.")],
+        embeds: [
+          errorEmbed("Không có bài đang phát", "Không có bài nào đang phát."),
+        ],
         ephemeral: true,
       });
       return;
@@ -20,15 +22,15 @@ export default {
 
     const track = queue.currentTrack;
     const embed = customEmbed({
-      title: "🎶 Now Playing",
+      title: "🎶 Đang phát",
       description: `**${track.title}**`,
       color: config.colors.primary,
       thumbnail: track.thumbnail,
       fields: [
-        { name: "Duration", value: track.duration, inline: true },
+        { name: "Thời lượng", value: track.duration, inline: true },
         {
-          name: "Requested By",
-          value: track.requestedBy?.tag || "Unknown",
+          name: "Yêu cầu bởi",
+          value: track.requestedBy?.tag || "Không rõ",
           inline: true,
         },
       ],

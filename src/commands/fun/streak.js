@@ -86,13 +86,13 @@ function applyStreakClaim(user, now) {
 
 function buildStatusEmbed(user, now, canClaim) {
   const description = canClaim
-    ? "Click the button below to claim your streak."
-    : "You've already claimed today!\nCome back tomorrow.";
+    ? "Bấm nút bên dưới để nhận streak."
+    : "Bạn đã nhận hôm nay rồi!\nHãy quay lại vào ngày mai.";
 
   return infoEmbed(
-    "Streak Minigame",
-    `${description}\n\nStreak: **${user.streakCount || 0}** day(s)` +
-      `\nRestores left this month: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**`,
+    "Minigame Streak",
+    `${description}\n\nStreak: **${user.streakCount || 0}** ngày` +
+      `\nSố lần khôi phục còn lại trong tháng: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**`,
   );
 }
 
@@ -129,7 +129,7 @@ export async function handleStreakClaim(interaction) {
   if (targetUserId && targetUserId !== userId) {
     return interaction.reply({
       embeds: [
-        errorEmbed("Not for you", "This button belongs to another user."),
+        errorEmbed("Không phải cho bạn", "Nút này thuộc về người khác."),
       ],
     });
   }
@@ -157,10 +157,10 @@ export async function handleStreakClaim(interaction) {
   await user.save();
 
   const embed = successEmbed(
-    "Streak Claimed!",
-    `Streak: **${user.streakCount}** day(s)` +
-      `${usedRestore ? "\n🧩 Used 1 streak restore." : ""}` +
-      `\nRestores left this month: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**`,
+    "Đã nhận streak!",
+    `Streak: **${user.streakCount}** ngày` +
+      `${usedRestore ? "\n🧩 Đã dùng 1 lượt khôi phục streak." : ""}` +
+      `\nSố lần khôi phục còn lại trong tháng: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**`,
   );
 
   const claimButton = buttons.streakClaim(false, userId);

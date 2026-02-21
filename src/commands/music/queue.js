@@ -13,7 +13,9 @@ export default {
 
     if (!queue?.currentTrack) {
       await interaction.reply({
-        embeds: [errorEmbed("Empty Queue", "There are no songs queued.")],
+        embeds: [
+          errorEmbed("Hàng đợi trống", "Không có bài nào trong hàng đợi."),
+        ],
         ephemeral: true,
       });
       return;
@@ -34,20 +36,20 @@ export default {
                 `**${start + index + 1}.** ${track.title} (${track.duration})`,
             )
             .join("\n")
-        : "No more songs in the queue.";
+        : "Không còn bài nào trong hàng đợi.";
 
       return customEmbed({
-        title: "🎵 Current Queue",
+        title: "🎵 Hàng đợi hiện tại",
         description,
         color: config.colors.primary,
         fields: [
           {
-            name: "Now Playing",
+            name: "Đang phát",
             value: `${queue.currentTrack.title} (${queue.currentTrack.duration})`,
           },
           {
-            name: "Queue Info",
-            value: `Tracks: **${tracks.length}** | Page **${page + 1}**/**${totalPages}**`,
+            name: "Thông tin hàng đợi",
+            value: `Bài: **${tracks.length}** | Trang **${page + 1}**/**${totalPages}**`,
           },
         ],
       });

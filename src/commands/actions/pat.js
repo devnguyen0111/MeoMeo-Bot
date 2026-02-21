@@ -12,6 +12,6 @@ export default {
         ),
     
     async execute(interaction) {
-        await handleAnimeInteraction(interaction, 'pat', 'patted');
+        await handleAnimeInteraction(interaction, 'pat', 'xoa đầu');
     }
 };

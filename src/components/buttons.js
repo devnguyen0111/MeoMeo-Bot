@@ -7,11 +7,11 @@ export function confirmationButtons(customIdPrefix = "confirm") {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(`${customIdPrefix}_yes`)
-      .setLabel("✅ Confirm")
+      .setLabel("✅ Xác nhận")
       .setStyle(ButtonStyle.Success),
     new ButtonBuilder()
       .setCustomId(`${customIdPrefix}_no`)
-      .setLabel("❌ Cancel")
+      .setLabel("❌ Hủy")
       .setStyle(ButtonStyle.Danger),
   );
 }
@@ -29,17 +29,17 @@ export function paginationButtons(
   row.addComponents(
     new ButtonBuilder()
       .setCustomId(`${customIdPrefix}_prev`)
-      .setLabel("◀️ Previous")
+      .setLabel("◀️ Trước")
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(currentPage === 0),
     new ButtonBuilder()
       .setCustomId(`${customIdPrefix}_home`)
-      .setLabel("🏠 Home")
+      .setLabel("🏠 Đầu")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(currentPage === 0),
     new ButtonBuilder()
       .setCustomId(`${customIdPrefix}_next`)
-      .setLabel("Next ▶️")
+      .setLabel("Tiếp ▶️")
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(currentPage >= totalPages - 1),
   );
@@ -96,7 +96,7 @@ export function streakClaimButton(canClaim = true, userId = null) {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(customId)
-      .setLabel(canClaim ? "🔥 Claim Streak" : "⏳ Already Claimed")
+      .setLabel(canClaim ? "🔥 Nhận streak" : "⏳ Đã nhận")
       .setStyle(canClaim ? ButtonStyle.Success : ButtonStyle.Secondary)
       .setDisabled(!canClaim),
   );
@@ -109,7 +109,7 @@ export function refreshButton(customId = "refresh") {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(customId)
-      .setLabel("🔄 Refresh")
+      .setLabel("🔄 Làm mới")
       .setStyle(ButtonStyle.Secondary),
   );
 }
@@ -121,7 +121,7 @@ export function viewLeaderboardButton() {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId("view_leaderboard")
-      .setLabel("📊 View Leaderboard")
+      .setLabel("📊 Xem BXH")
       .setStyle(ButtonStyle.Primary),
   );
 }
@@ -133,7 +133,7 @@ export function viewMyRankButton(userId) {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(`view_rank_${userId}`)
-      .setLabel("👤 View My Rank")
+      .setLabel("👤 Xem hạng của mình")
       .setStyle(ButtonStyle.Success),
   );
 }

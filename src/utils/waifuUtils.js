@@ -1,208 +1,220 @@
-import { EmbedBuilder } from 'discord.js';
-import config from '../../config/config.js';
+import { EmbedBuilder } from "discord.js";
+import config from "../../config/config.js";
 
 const ACTION_TEMPLATES = {
-    kiss: [
-        "{user} kissed {target}! 😘",
-        "{user} gave {target} a big kiss! 💋",
-        "{user} steals a kiss from {target}! 😳",
-        "{user} plants a kiss on {target}'s cheek! 😽",
-        "{user} leans in and kisses {target}! 💖",
-        "Mwah! {user} kisses {target}! 💋",
-        "{user} gives {target} a passionate kiss! 🌹",
-        "{user} kisses {target} on the forehead! ✨",
-        "{user} peppers {target}'s face with kisses! 😍",
-        "{target} got a surprise kiss from {user}! 🎁"
-    ],
-    hug: [
-        "{user} hugs {target}! 🤗",
-        "{user} gives {target} a warm hug! 💖",
-        "{user} tightly hugs {target}! 🫂",
-        "{user} embraces {target}! ✨",
-        "{user} squeezes {target} in a bear hug! 🐻",
-        "{user} wraps their arms around {target}! 💝",
-        "{user} tackles {target} with a hug! 💥",
-        "{user} refuses to let go of {target}! 🔒",
-        "{user} pulls {target} into a comforting hug! 🌸",
-        "{target} gets a massive hug from {user}! 💫"
-    ],
-    pat: [
-        "{user} pats {target} on the head! 💆",
-        "{user} gently pats {target}! ✨",
-        "{user} comforts {target} with a pat! 🌸",
-        "*pat pat* {user} pats {target}! 🖐️",
-        "{user} pets {target} like a good kitty! 🐱",
-        "{user} ruffles {target}'s hair! 💇",
-        "{user} give {target} headpats! 💖",
-        "There there... {user} pats {target}! 🍵",
-        "{user} thinks {target} deserves a pat! ⭐",
-        "{user} pats {target} affectionately! 🥰"
-    ],
-    slap: [
-        "{user} slapped {target}! 👋",
-        "{user} gives {target} a good slap! 💢",
-        "{user} hit {target} with a slap! 😤",
-        "Oof! {user} slapped {target}! 💫",
-        "Kapow! {user} slaps {target}! 💥",
-        "{user} slaps {target} across the face! 😱",
-        "{user} decided {target} needed a slap! 🤚",
-        "{target} felt the sting of {user}'s slap! 🔥",
-        "Take that! {user} slaps {target}! ⚡",
-        "{user} slaps some sense into {target}! 🧠"
-    ],
-    poke: [
-        "{user} poked {target}! 👉",
-        "{user} gives {target} a poke! 👆",
-        "{user} boops {target}! 🐽",
-        "Hey! {user} poked {target}! 💢",
-        "{user} annoys {target} with pokes! 🌀",
-        "{user} pokes {target}'s cheek! 😛",
-        "{user} wants {target}'s attention! 👉",
-        "Poke poke! {user} bothers {target}! 🔔",
-        "{user} sneakily pokes {target}! 🕵️",
-        "{target} got poked by {user}! 🎯"
-    ],
-    cuddle: [
-        "{user} cuddles with {target}! 🧸",
-        "{user} snuggles up to {target}! 💤",
-        "{user} holds {target} close! 💖",
-        "{target} is being cuddled by {user}! ✨",
-        "{user} wants to cuddle with {target}! 🥰",
-        "{user} and {target} are cuddling together! 🌸",
-        "{user} spoons {target}! 🥄",
-        "{user} keeps {target} warm with a cuddle! 🔥",
-        "{user} buries their face in {target} while cuddling! 🙈",
-        "Cuddle time for {user} and {target}! ⏰"
-    ],
-    kill: [
-        "{user} killed {target}! 🔪",
-        "{user} ended {target}! 💀",
-        "{user} murdered {target}! 🩸",
-        "R.I.P {target}, killed by {user}... 🪦",
-        "{user} assassinated {target}! 🥷",
-        "{user} decided {target} had to go... ⚰️",
-        "{user} puts an end to {target}! 🚫",
-        "{target} was wasted by {user}! 🔫",
-        "{user} commits a crime against {target}! 🚔",
-        "Fatality! {user} destroys {target}! 🧱"
-    ],
-    
-    // Solo actions
-    cry: [
-        "{user} is crying... 😢",
-        "{user} bursts into tears! 😭",
-        "{user} is shedding tears... 💧",
-        "Someone comfort {user}, they are crying... 😿",
-        "{user} is having a bad day... 🌧️",
-        "{user} can't stop crying! 🌊",
-        "{user} needs a hug... 💔",
-        "Tears are falling from {user}'s eyes... ☔",
-        "{user} is sobbing uncontrollably! 🤧",
-        "Why is {user} crying? :("
-    ],
-    smile: [
-        "{user} is smiling! 😄",
-        "{user} beams with a smile! ✨",
-        "{user} looks happy! 💖",
-        "{user} flashes a bright smile! 😁",
-        "{user} is grinning from ear to ear! 😃",
-        "{user}'s smile lights up the room! 💡",
-        "{user} sends a smile to everyone! 💌",
-        "{user} is in a good mood! 🎵",
-        "{user} smiles warmly! ☀️",
-        "Keep smiling {user}! 🌟"
-    ]
+  kiss: [
+    "{user} hôn {target}! 😘",
+    "{user} trao {target} một nụ hôn thật to! 💋",
+    "{user} bất ngờ hôn trộm {target}! 😳",
+    "{user} hôn lên má {target}! 😽",
+    "{user} nghiêng người hôn {target}! 💖",
+    "Mwah! {user} hôn {target}! 💋",
+    "{user} hôn {target} thật nồng nàn! 🌹",
+    "{user} hôn lên trán {target}! ✨",
+    "{user} tặng {target} cả rổ nụ hôn! 😍",
+    "{target} nhận nụ hôn bất ngờ từ {user}! 🎁",
+  ],
+  hug: [
+    "{user} ôm {target}! 🤗",
+    "{user} ôm {target} thật ấm áp! 💖",
+    "{user} ôm siết {target}! 🫂",
+    "{user} ôm chặt {target}! ✨",
+    "{user} ôm gấu {target}! 🐻",
+    "{user} vòng tay ôm lấy {target}! 💝",
+    "{user} lao tới ôm {target}! 💥",
+    "{user} không muốn buông {target}! 🔒",
+    "{user} kéo {target} vào một cái ôm dịu dàng! 🌸",
+    "{target} nhận một cái ôm thật to từ {user}! 💫",
+  ],
+  pat: [
+    "{user} xoa đầu {target}! 💆",
+    "{user} nhẹ nhàng xoa đầu {target}! ✨",
+    "{user} vỗ về {target} bằng cái xoa đầu! 🌸",
+    "*pat pat* {user} xoa đầu {target}! 🖐️",
+    "{user} vuốt ve {target} như một chú mèo ngoan! 🐱",
+    "{user} xoa rối tóc {target}! 💇",
+    "{user} tặng {target} vài cái xoa đầu! 💖",
+    "Ngoan nào... {user} xoa đầu {target}! 🍵",
+    "{user} thấy {target} xứng đáng được xoa đầu! ⭐",
+    "{user} xoa đầu {target} thật trìu mến! 🥰",
+  ],
+  slap: [
+    "{user} tát {target}! 👋",
+    "{user} cho {target} một cái tát! 💢",
+    "{user} tát {target} một cái! 😤",
+    "Ối! {user} tát {target}! 💫",
+    "Bốp! {user} tát {target}! 💥",
+    "{user} tát thẳng mặt {target}! 😱",
+    "{user} quyết định {target} cần một cái tát! 🤚",
+    "{target} cảm nhận cú tát từ {user}! 🔥",
+    "Ăn này! {user} tát {target}! ⚡",
+    "{user} tát {target} cho tỉnh! 🧠",
+  ],
+  poke: [
+    "{user} chọc {target}! 👉",
+    "{user} chọc {target} một cái! 👆",
+    "{user} chạm nhẹ {target}! 🐽",
+    "Này! {user} chọc {target}! 💢",
+    "{user} trêu {target} bằng mấy cú chọc! 🌀",
+    "{user} chọc má {target}! 😛",
+    "{user} muốn {target} chú ý! 👉",
+    "Chọc chọc! {user} làm phiền {target}! 🔔",
+    "{user} lén chọc {target}! 🕵️",
+    "{target} bị {user} chọc! 🎯",
+  ],
+  cuddle: [
+    "{user} ôm ấp {target}! 🧸",
+    "{user} rúc vào {target}! 💤",
+    "{user} ôm {target} thật sát! 💖",
+    "{target} đang được {user} ôm ấp! ✨",
+    "{user} muốn ôm ấp {target}! 🥰",
+    "{user} và {target} đang ôm ấp nhau! 🌸",
+    "{user} nằm ôm {target}! 🥄",
+    "{user} giữ ấm {target} bằng một cái ôm! 🔥",
+    "{user} vùi mặt vào {target} khi ôm ấp! 🙈",
+    "Đến giờ ôm ấp của {user} và {target}! ⏰",
+  ],
+  kill: [
+    "{user} hạ gục {target}! 🔪",
+    "{user} tiễn {target}! 💀",
+    "{user} kết liễu {target}! 🩸",
+    "R.I.P {target}, bị {user} hạ gục... 🪦",
+    "{user} ám sát {target}! 🥷",
+    "{user} quyết định {target} phải đi... ⚰️",
+    "{user} chấm dứt {target}! 🚫",
+    "{target} bị {user} hạ đo ván! 🔫",
+    "{user} gây án với {target}! 🚔",
+    "Fatality! {user} hạ gục {target}! 🧱",
+  ],
+
+  // Solo actions
+  cry: [
+    "{user} đang khóc... 😢",
+    "{user} bật khóc nức nở! 😭",
+    "{user} rơi nước mắt... 💧",
+    "Ai đó an ủi {user} đi, đang khóc rồi... 😿",
+    "{user} có một ngày tồi tệ... 🌧️",
+    "{user} không thể ngừng khóc! 🌊",
+    "{user} cần một cái ôm... 💔",
+    "Nước mắt lăn dài trên má {user}... ☔",
+    "{user} khóc nức nở không ngừng! 🤧",
+    "Sao {user} lại khóc? :(",
+  ],
+  smile: [
+    "{user} đang mỉm cười! 😄",
+    "{user} nở nụ cười rạng rỡ! ✨",
+    "{user} trông thật vui! 💖",
+    "{user} cười tươi hết cỡ! 😁",
+    "{user} cười toe toét! 😃",
+    "Nụ cười của {user} làm sáng cả căn phòng! 💡",
+    "{user} gửi một nụ cười tới mọi người! 💌",
+    "{user} đang rất vui! 🎵",
+    "{user} mỉm cười ấm áp! ☀️",
+    "Cứ cười nhé {user}! 🌟",
+  ],
 };
 
 const SELF_TEMPLATES = {
-    kiss: "{user} tries to kiss themselves... mirrors exist? 😳",
-    hug: "{user} hugs themselves... it's gonna be okay! 🫂",
-    pat: "{user} pats themselves on the head. Good job! 💆",
-    slap: "{user} slapped themselves... why? 🤨",
-    poke: "{user} poked themselves. Did it hurt? 👉",
-    cuddle: "{user} cuddles a pillow since they are alone... 🧸",
-    kill: "{user} chose the easy way out... 💀"
+  kiss: "{user} định tự hôn mình... soi gương hả? 😳",
+  hug: "{user} tự ôm mình... sẽ ổn thôi! 🫂",
+  pat: "{user} tự xoa đầu. Giỏi lắm! 💆",
+  slap: "{user} tự tát mình... vì sao? 🤨",
+  poke: "{user} tự chọc mình. Có đau không? 👉",
+  cuddle: "{user} ôm gối vì đang cô đơn... 🧸",
+  kill: "{user} chọn con đường dễ... 💀",
 };
 
 /**
  * Fetch image from waifu.pics
- * @param {string} category 
+ * @param {string} category
  * @param {string} type 'sfw' or 'nsfw'
  * @returns {Promise<string>} Image URL
  */
-export async function getWaifuImage(category, type = 'sfw') {
-    try {
-        const response = await fetch(`https://api.waifu.pics/${type}/${category}`);
-        if (!response.ok) throw new Error(`API Error: ${response.status}`);
-        const data = await response.json();
-        return data.url;
-    } catch (error) {
-        console.error(`Waifu API Error (${category}):`, error);
-        return null; // Return null on error
-    }
+export async function getWaifuImage(category, type = "sfw") {
+  try {
+    const response = await fetch(`https://api.waifu.pics/${type}/${category}`);
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+    const data = await response.json();
+    return data.url;
+  } catch (error) {
+    console.error(`Waifu API Error (${category}):`, error);
+    return null; // Return null on error
+  }
 }
 
 /**
  * Handle generic anime interaction command
- * @param {import('discord.js').ChatInputCommandInteraction} interaction 
+ * @param {import('discord.js').ChatInputCommandInteraction} interaction
  * @param {string} category Waifu.pics category
  * @param {string} actionVerb Deprecated - text is now looked up from templates
  * @param {boolean} targetsUser Whether the action targets another user (default true)
  */
-export async function handleAnimeInteraction(interaction, category, actionVerb, targetsUser = true) {
-    await interaction.deferReply();
-    
-    // Check for self-target prevention or silly responses could be added here
-    const target = targetsUser ? interaction.options.getUser('user') : null;
-    
-    // Construct message
-    let description;
-    
-    if (targetsUser && target) {
-        // Self targeting special cases
-        if (target.id === interaction.user.id) {
-            description = SELF_TEMPLATES[category] 
-                ? SELF_TEMPLATES[category].replace('{user}', `**${interaction.user.username}**`)
-                : `**${interaction.user.username}** ${actionVerb} themselves! 😳`;
-        } else {
-            // Random template for action
-            const templates = ACTION_TEMPLATES[category];
-            if (templates && templates.length > 0) {
-                const template = templates[Math.floor(Math.random() * templates.length)];
-                description = template
-                    .replace('{user}', `**${interaction.user.username}**`)
-                    .replace('{target}', `**${target.username}**`);
-            } else {
-                // Fallback
-                 description = `**${interaction.user.username}** ${actionVerb} **${target.username}**!`;
-            }
-        }
+export async function handleAnimeInteraction(
+  interaction,
+  category,
+  actionVerb,
+  targetsUser = true,
+) {
+  await interaction.deferReply();
+
+  // Check for self-target prevention or silly responses could be added here
+  const target = targetsUser ? interaction.options.getUser("user") : null;
+
+  // Construct message
+  let description;
+
+  if (targetsUser && target) {
+    // Self targeting special cases
+    if (target.id === interaction.user.id) {
+      description = SELF_TEMPLATES[category]
+        ? SELF_TEMPLATES[category].replace(
+            "{user}",
+            `**${interaction.user.username}**`,
+          )
+        : `**${interaction.user.username}** ${actionVerb} chính mình! 😳`;
     } else {
-        // Solo action
-        const templates = ACTION_TEMPLATES[category];
-        if (templates && templates.length > 0) {
-            const template = templates[Math.floor(Math.random() * templates.length)];
-            description = template.replace('{user}', `**${interaction.user.username}**`);
-        } else {
-             // Fallback
-            description = `**${interaction.user.username}** ${actionVerb}!`;
-        }
+      // Random template for action
+      const templates = ACTION_TEMPLATES[category];
+      if (templates && templates.length > 0) {
+        const template =
+          templates[Math.floor(Math.random() * templates.length)];
+        description = template
+          .replace("{user}", `**${interaction.user.username}**`)
+          .replace("{target}", `**${target.username}**`);
+      } else {
+        // Fallback
+        description = `**${interaction.user.username}** ${actionVerb} **${target.username}**!`;
+      }
     }
-
-    const imageUrl = await getWaifuImage(category, 'sfw');
-
-    const embed = new EmbedBuilder()
-        .setDescription(description)
-        .setColor(config.colors?.primary || 0x00ae86)
-        .setImage(imageUrl)
-        .setTimestamp();
-
-    if (!imageUrl) {
-        return interaction.editReply({ 
-            content: '❌ Failed to fetch image. The API might be down.',
-            ephemeral: true 
-        });
+  } else {
+    // Solo action
+    const templates = ACTION_TEMPLATES[category];
+    if (templates && templates.length > 0) {
+      const template = templates[Math.floor(Math.random() * templates.length)];
+      description = template.replace(
+        "{user}",
+        `**${interaction.user.username}**`,
+      );
+    } else {
+      // Fallback
+      description = `**${interaction.user.username}** ${actionVerb}!`;
     }
+  }
 
-    await interaction.editReply({ embeds: [embed] });
+  const imageUrl = await getWaifuImage(category, "sfw");
+
+  const embed = new EmbedBuilder()
+    .setDescription(description)
+    .setColor(config.colors?.primary || 0x00ae86)
+    .setImage(imageUrl)
+    .setTimestamp();
+
+  if (!imageUrl) {
+    return interaction.editReply({
+      content: "❌ Không lấy được ảnh. API có thể đang gặp sự cố.",
+      ephemeral: true,
+    });
+  }
+
+  await interaction.editReply({ embeds: [embed] });
 }

@@ -12,6 +12,6 @@ export default {
         ),
     
     async execute(interaction) {
-        await handleAnimeInteraction(interaction, 'kill', 'killed');
+        await handleAnimeInteraction(interaction, 'kill', 'hạ gục');
     }
 };

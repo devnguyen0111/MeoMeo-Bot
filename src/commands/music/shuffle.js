@@ -11,7 +11,9 @@ export default {
 
     if (!queue?.currentTrack) {
       await interaction.reply({
-        embeds: [errorEmbed("Nothing Playing", "There is no song playing.")],
+        embeds: [
+          errorEmbed("Không có bài đang phát", "Không có bài nào đang phát."),
+        ],
         ephemeral: true,
       });
       return;
@@ -19,7 +21,7 @@ export default {
 
     if (queue.tracks.size < 2) {
       await interaction.reply({
-        embeds: [errorEmbed("Not Enough Songs", "Add more songs to shuffle.")],
+        embeds: [errorEmbed("Chưa đủ bài", "Thêm bài để xáo trộn.")],
         ephemeral: true,
       });
       return;
@@ -28,7 +30,7 @@ export default {
     queue.tracks.shuffle();
 
     await interaction.reply({
-      embeds: [successEmbed("Queue Shuffled", "Queue order updated.")],
+      embeds: [successEmbed("Đã xáo trộn", "Đã cập nhật thứ tự hàng đợi.")],
     });
   },
 };

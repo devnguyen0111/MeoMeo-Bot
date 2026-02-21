@@ -12,6 +12,6 @@ export default {
         ),
     
     async execute(interaction) {
-        await handleAnimeInteraction(interaction, 'poke', 'poked');
+        await handleAnimeInteraction(interaction, 'poke', 'chọc');
     }
 };

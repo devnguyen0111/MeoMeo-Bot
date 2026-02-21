@@ -12,6 +12,6 @@ export default {
         ),
     
     async execute(interaction) {
-        await handleAnimeInteraction(interaction, 'slap', 'slapped');
+        await handleAnimeInteraction(interaction, 'slap', 'tát');
     }
 };

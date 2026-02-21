@@ -26,14 +26,18 @@ export default {
       thumbnail: targetUser.displayAvatarURL({ dynamic: true, size: 256 }),
       color: member.displayColor || config.colors.primary,
       fields: [
-        { name: "🆔 User ID", value: `\`${targetUser.id}\``, inline: true },
         {
-          name: "📅 Account Created",
+          name: "🆔 ID người dùng",
+          value: `\`${targetUser.id}\``,
+          inline: true,
+        },
+        {
+          name: "📅 Ngày tạo tài khoản",
           value: `<t:${Math.floor(targetUser.createdTimestamp / 1000)}:R>`,
           inline: true,
         },
         {
-          name: "📥 Joined Server",
+          name: "📥 Ngày vào máy chủ",
           value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`,
           inline: true,
         },
@@ -50,7 +54,7 @@ export default {
 
     if (roles.length > 0) {
       embed.addFields({
-        name: `🎭 Roles [${member.roles.cache.size - 1}]`,
+        name: `🎭 Vai trò [${member.roles.cache.size - 1}]`,
         value: roles.join(", ") + (member.roles.cache.size > 11 ? "..." : ""),
       });
     }
@@ -61,15 +65,15 @@ export default {
 
       if (userData) {
         statsFields.push({
-          name: "📊 Level & XP",
-          value: `Level: **${userData.level}**\nXP: **${userData.xp}**`,
+          name: "📊 Cấp & XP",
+          value: `Cấp: **${userData.level}**\nXP: **${userData.xp}**`,
           inline: true,
         });
 
         const hours = Math.floor(userData.totalVoiceTime / 60);
         const mins = userData.totalVoiceTime % 60;
         statsFields.push({
-          name: "🎙️ Voice Time",
+          name: "🎙️ Thời gian voice",
           value: `${hours}h ${mins}m`,
           inline: true,
         });

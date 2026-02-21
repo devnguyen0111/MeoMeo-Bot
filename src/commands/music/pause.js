@@ -11,7 +11,9 @@ export default {
 
     if (!queue?.currentTrack) {
       await interaction.reply({
-        embeds: [errorEmbed("Nothing Playing", "There is no song playing.")],
+        embeds: [
+          errorEmbed("Không có bài đang phát", "Không có bài nào đang phát."),
+        ],
         ephemeral: true,
       });
       return;
@@ -20,7 +22,7 @@ export default {
     queue.node.setPaused(true);
 
     await interaction.reply({
-      embeds: [successEmbed("Paused", "Playback paused.")],
+      embeds: [successEmbed("Đã tạm dừng", "Đã tạm dừng phát.")],
     });
   },
 };

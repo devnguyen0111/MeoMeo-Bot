@@ -20,7 +20,9 @@ export default {
 
     if (!queue?.currentTrack) {
       await interaction.reply({
-        embeds: [errorEmbed("Nothing Playing", "There is no song playing.")],
+        embeds: [
+          errorEmbed("Không có bài đang phát", "Không có bài nào đang phát."),
+        ],
         ephemeral: true,
       });
       return;
@@ -29,7 +31,9 @@ export default {
     queue.node.setVolume(level);
 
     await interaction.reply({
-      embeds: [successEmbed("Volume Updated", `Volume set to **${level}**.`)],
+      embeds: [
+        successEmbed("Đã cập nhật âm lượng", `Âm lượng đặt ở **${level}**.`),
+      ],
     });
   },
 };

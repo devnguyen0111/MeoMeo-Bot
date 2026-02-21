@@ -12,6 +12,6 @@ export default {
         ),
     
     async execute(interaction) {
-        await handleAnimeInteraction(interaction, 'hug', 'hugged');
+        await handleAnimeInteraction(interaction, 'hug', 'ôm');
     }
 };

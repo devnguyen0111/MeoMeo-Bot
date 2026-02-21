@@ -12,6 +12,6 @@ export default {
         ),
     
     async execute(interaction) {
-        await handleAnimeInteraction(interaction, 'cuddle', 'cuddled with');
+        await handleAnimeInteraction(interaction, 'cuddle', 'ôm ấp');
     }
 };

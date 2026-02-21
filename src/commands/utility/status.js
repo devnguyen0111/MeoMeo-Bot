@@ -9,10 +9,10 @@ function formatDuration(ms) {
   const seconds = totalSeconds % 60;
 
   const parts = [];
-  if (days) parts.push(`${days}d`);
-  if (hours) parts.push(`${hours}h`);
-  if (minutes) parts.push(`${minutes}m`);
-  parts.push(`${seconds}s`);
+  if (days) parts.push(`${days} ngày`);
+  if (hours) parts.push(`${hours} giờ`);
+  if (minutes) parts.push(`${minutes} phút`);
+  parts.push(`${seconds} giây`);
 
   return parts.join(" ");
 }
@@ -48,45 +48,45 @@ export default {
 
     const memory = process.memoryUsage();
     const embed = customEmbed({
-      title: "🤖 Bot Status",
+      title: "🤖 Trạng thái bot",
       fields: [
         {
-          name: "⏱️ Uptime",
-          value: `${formatDuration(uptimeMs)}\nStarted <t:${Math.floor(
+          name: "⏱️ Thời gian hoạt động",
+          value: `${formatDuration(uptimeMs)}\nBắt đầu <t:${Math.floor(
             startedAt / 1000,
           )}:R>`,
           inline: true,
         },
         {
-          name: "📊 Commands",
-          value: `Total: ${totalCommands}\nUnique: ${uniqueCommands}`,
+          name: "📊 Lệnh",
+          value: `Tổng: ${totalCommands}\nDuy nhất: ${uniqueCommands}`,
           inline: true,
         },
         {
-          name: "📡 Connection",
+          name: "📡 Kết nối",
           value: `Ping: ${Math.round(client.ws.ping)}ms`,
           inline: true,
         },
         {
-          name: "🧠 Memory",
+          name: "🧠 Bộ nhớ",
           value: `RSS: ${formatBytes(memory.rss)}\nHeap: ${formatBytes(
             memory.heapUsed,
           )}`,
           inline: true,
         },
         {
-          name: "🏠 Servers",
-          value: `Guilds: ${client.guilds.cache.size}\nUsers: ${client.users.cache.size}`,
+          name: "🏠 Máy chủ",
+          value: `Máy chủ: ${client.guilds.cache.size}\nNgười dùng: ${client.users.cache.size}`,
           inline: true,
         },
         {
-          name: "⚙️ Versions",
+          name: "⚙️ Phiên bản",
           value: `Node: ${process.version}\ndiscord.js: v${djsVersion}`,
           inline: true,
         },
         {
-          name: "🔥 Top Commands",
-          value: topCommands || "No data yet.",
+          name: "🔥 Lệnh dùng nhiều",
+          value: topCommands || "Chưa có dữ liệu.",
           inline: false,
         },
       ],

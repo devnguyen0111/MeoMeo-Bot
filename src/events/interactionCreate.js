@@ -83,7 +83,7 @@ async function handleCommand(interaction) {
     logger.error(`Error executing ${interaction.commandName}:`, error);
 
     const errorMessage = {
-      content: "❌ There was an error while executing this command!",
+      content: "❌ Đã có lỗi khi thực thi lệnh này!",
       ephemeral: true,
     };
 
@@ -132,14 +132,14 @@ async function handleNsfwButton(interaction) {
       .setImage(data.message)
       .setColor(0xff0000)
       .setFooter({
-        text: `Requested by ${interaction.user.tag} • NSFW Content • 18+`,
+        text: `Yêu cầu bởi ${interaction.user.tag} • Nội dung NSFW • 18+`,
       })
       .setTimestamp();
 
     // Create download button
     const downloadButton = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setLabel("Download")
+        .setLabel("Tải xuống")
         .setStyle(ButtonStyle.Link)
         .setURL(data.message)
         .setEmoji("📥"),
@@ -169,7 +169,7 @@ async function handleNsfwButton(interaction) {
   } catch (error) {
     logger.error("NSFW button error:", error);
     await interaction.editReply({
-      content: "❌ Failed to fetch image. Please try again later.",
+      content: "❌ Không lấy được ảnh. Vui lòng thử lại sau.",
     });
   }
 }

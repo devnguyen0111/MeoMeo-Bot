@@ -14,13 +14,13 @@ export function moderationReasonModal(
 ) {
   const modal = new ModalBuilder()
     .setCustomId(customId)
-    .setTitle(`${action} Reason`);
+    .setTitle(`Lý do ${action}`);
 
   const reasonInput = new TextInputBuilder()
     .setCustomId("reason_input")
-    .setLabel("Reason")
+    .setLabel("Lý do")
     .setStyle(TextInputStyle.Paragraph)
-    .setPlaceholder(`Enter reason for ${action.toLowerCase()}`)
+    .setPlaceholder(`Nhập lý do cho ${action.toLowerCase()}`)
     .setRequired(true)
     .setMinLength(3)
     .setMaxLength(500);
@@ -36,22 +36,22 @@ export function moderationReasonModal(
 export function banModal() {
   const modal = new ModalBuilder()
     .setCustomId("ban_modal")
-    .setTitle("Ban Member");
+    .setTitle("Cấm thành viên");
 
   const reasonInput = new TextInputBuilder()
     .setCustomId("ban_reason")
-    .setLabel("Ban Reason")
+    .setLabel("Lý do cấm")
     .setStyle(TextInputStyle.Paragraph)
-    .setPlaceholder("Enter reason for ban")
+    .setPlaceholder("Nhập lý do cấm")
     .setRequired(true)
     .setMinLength(3)
     .setMaxLength(500);
 
   const deleteMessagesInput = new TextInputBuilder()
     .setCustomId("delete_messages_days")
-    .setLabel("Delete Messages (days)")
+    .setLabel("Xóa tin nhắn (ngày)")
     .setStyle(TextInputStyle.Short)
-    .setPlaceholder("0-7 days (default: 0)")
+    .setPlaceholder("0-7 ngày (mặc định: 0)")
     .setRequired(false)
     .setValue("0")
     .setMinLength(1)
@@ -69,7 +69,7 @@ export function banModal() {
  * Warn modal
  */
 export function warnModal() {
-  return moderationReasonModal("Warning", "warn_modal");
+  return moderationReasonModal("Cảnh cáo", "warn_modal");
 }
 
 /**

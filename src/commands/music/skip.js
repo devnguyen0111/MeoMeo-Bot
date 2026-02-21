@@ -19,7 +19,9 @@ export default {
 
     if (!queue?.currentTrack) {
       await interaction.reply({
-        embeds: [errorEmbed("Nothing Playing", "There is no song playing.")],
+        embeds: [
+          errorEmbed("Không có bài đang phát", "Không có bài nào đang phát."),
+        ],
         ephemeral: true,
       });
       return;
@@ -29,10 +31,7 @@ export default {
     if (amount > remaining) {
       await interaction.reply({
         embeds: [
-          errorEmbed(
-            "Not Enough Songs",
-            `Only **${remaining}** song(s) are available to skip.`,
-          ),
+          errorEmbed("Chưa đủ bài", `Chỉ có **${remaining}** bài để bỏ qua.`),
         ],
         ephemeral: true,
       });
@@ -44,7 +43,7 @@ export default {
     }
 
     await interaction.reply({
-      embeds: [successEmbed("Skipped", `Skipped **${amount}** song(s).`)],
+      embeds: [successEmbed("Đã bỏ qua", `Đã bỏ qua **${amount}** bài.`)],
     });
   },
 };

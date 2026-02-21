@@ -33,7 +33,7 @@ export default {
       const connection = getVoiceConnection(interaction.guildId);
       if (!connection) {
         await interaction.reply({
-          embeds: [infoEmbed("Not in voice", "I'm not in a voice channel.")],
+          embeds: [infoEmbed("Không ở voice", "Mình không ở kênh voice.")],
           ephemeral: true,
         });
         return;
@@ -41,9 +41,7 @@ export default {
 
       connection.destroy();
       await interaction.reply({
-        embeds: [
-          successEmbed("Left voice", "Disconnected from the voice channel."),
-        ],
+        embeds: [successEmbed("Đã rời voice", "Đã rời kênh voice.")],
         ephemeral: true,
       });
       return;
@@ -55,7 +53,7 @@ export default {
     if (!channel) {
       await interaction.reply({
         embeds: [
-          errorEmbed("No voice channel", "Please join a voice channel first."),
+          errorEmbed("Không có kênh voice", "Vui lòng vào kênh voice trước."),
         ],
         ephemeral: true,
       });
@@ -67,7 +65,7 @@ export default {
       channel.type !== ChannelType.GuildStageVoice
     ) {
       await interaction.reply({
-        embeds: [errorEmbed("Invalid channel", "Please use a voice channel.")],
+        embeds: [errorEmbed("Kênh không hợp lệ", "Vui lòng dùng kênh voice.")],
         ephemeral: true,
       });
       return;
@@ -78,9 +76,7 @@ export default {
 
     if (!permissions?.has(PermissionFlagsBits.Connect)) {
       await interaction.reply({
-        embeds: [
-          errorEmbed("Missing permissions", "I need Connect permission."),
-        ],
+        embeds: [errorEmbed("Thiếu quyền", "Mình cần quyền Connect.")],
         ephemeral: true,
       });
       return;
@@ -89,9 +85,7 @@ export default {
     const existing = getVoiceConnection(interaction.guildId);
     if (existing?.joinConfig?.channelId === channel.id) {
       await interaction.reply({
-        embeds: [
-          infoEmbed("Already connected", `I'm already in **${channel.name}**.`),
-        ],
+        embeds: [infoEmbed("Đã kết nối", `Mình đã ở **${channel.name}** rồi.`)],
         ephemeral: true,
       });
       return;
@@ -114,16 +108,14 @@ export default {
 
       await interaction.reply({
         embeds: [
-          successEmbed("Staying in voice", `Joined **${channel.name}**.`),
+          successEmbed("Đang ở lại voice", `Đã vào **${channel.name}**.`),
         ],
         ephemeral: true,
       });
     } catch (error) {
       connection.destroy();
       await interaction.reply({
-        embeds: [
-          errorEmbed("Failed to join", "I couldn't connect to that channel."),
-        ],
+        embeds: [errorEmbed("Không thể vào", "Mình không thể vào kênh đó.")],
         ephemeral: true,
       });
     }

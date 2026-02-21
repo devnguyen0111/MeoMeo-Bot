@@ -7,6 +7,6 @@ export default {
         .setDescription('Smile! 😄'),
     
     async execute(interaction) {
-        await handleAnimeInteraction(interaction, 'smile', 'is smiling', false);
+        await handleAnimeInteraction(interaction, 'smile', 'đang mỉm cười', false);
     }
 };

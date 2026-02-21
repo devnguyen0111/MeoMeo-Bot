@@ -21,7 +21,9 @@ export default {
 
     if (!voiceChannel) {
       await interaction.reply({
-        embeds: [errorEmbed("No Voice Channel", "Join a voice channel first.")],
+        embeds: [
+          errorEmbed("Chưa vào kênh voice", "Vui lòng vào kênh voice trước."),
+        ],
         ephemeral: true,
       });
       return;
@@ -30,7 +32,9 @@ export default {
     const player = interaction.client.player;
     if (!player) {
       await interaction.reply({
-        embeds: [errorEmbed("Music Unavailable", "Music system is not ready.")],
+        embeds: [
+          errorEmbed("Nhạc chưa sẵn sàng", "Hệ thống nhạc chưa sẵn sàng."),
+        ],
         ephemeral: true,
       });
       return;
@@ -44,8 +48,8 @@ export default {
       await interaction.reply({
         embeds: [
           errorEmbed(
-            "Already Playing",
-            "I am already playing in another voice channel.",
+            "Đang phát ở kênh khác",
+            "Mình đang phát ở kênh voice khác.",
           ),
         ],
         ephemeral: true,
@@ -98,7 +102,9 @@ export default {
         logger.warn(`No results for query: ${query}`);
       }
       await interaction.editReply({
-        embeds: [errorEmbed("No Results", "I could not find any matches.")],
+        embeds: [
+          errorEmbed("Không có kết quả", "Mình không tìm thấy kết quả nào."),
+        ],
       });
       return;
     }
@@ -133,10 +139,7 @@ export default {
       queue.delete();
       await interaction.editReply({
         embeds: [
-          errorEmbed(
-            "Connection Failed",
-            "I could not join the voice channel.",
-          ),
+          errorEmbed("Kết nối thất bại", "Mình không thể vào kênh voice."),
         ],
       });
       return;
@@ -165,8 +168,8 @@ export default {
         await interaction.editReply({
           embeds: [
             errorEmbed(
-              "Playback Failed",
-              "I could not play this track. Please try another song.",
+              "Phát thất bại",
+              "Mình không thể phát bài này. Vui lòng thử bài khác.",
             ),
           ],
         });
@@ -178,8 +181,8 @@ export default {
       await interaction.editReply({
         embeds: [
           successEmbed(
-            "Playlist Queued",
-            `Added **${searchResult.playlist.title}** with **${searchResult.tracks.length}** tracks.`,
+            "Đã thêm playlist",
+            `Đã thêm **${searchResult.playlist.title}** với **${searchResult.tracks.length}** bài.`,
           ),
         ],
       });
@@ -189,7 +192,10 @@ export default {
     const track = searchResult.tracks[0];
     await interaction.editReply({
       embeds: [
-        successEmbed("Track Queued", `Added **${track.title}** to the queue.`),
+        successEmbed(
+          "Đã thêm vào hàng đợi",
+          `Đã thêm **${track.title}** vào hàng đợi.`,
+        ),
       ],
     });
   },

@@ -12,6 +12,6 @@ export default {
         ),
     
     async execute(interaction) {
-        await handleAnimeInteraction(interaction, 'kiss', 'kissed');
+        await handleAnimeInteraction(interaction, 'kiss', 'hôn');
     }
 };

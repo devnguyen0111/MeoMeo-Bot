@@ -7,6 +7,6 @@ export default {
         .setDescription('Cry... 😢'),
     
     async execute(interaction) {
-        await handleAnimeInteraction(interaction, 'cry', 'is crying', false);
+        await handleAnimeInteraction(interaction, 'cry', 'đang khóc', false);
     }
 };
