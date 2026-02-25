@@ -124,6 +124,39 @@ const SELF_TEMPLATES = {
   kill: "{user} chọn con đường dễ... 💀",
 };
 
+export function buildActionDescription(
+  category,
+  userName,
+  targetName = null,
+  isSelf = false,
+) {
+  if (isSelf && targetName) {
+    return SELF_TEMPLATES[category]
+      ? SELF_TEMPLATES[category].replace("{user}", `**${userName}**`)
+      : `**${userName}** ${category} chính mình! 😳`;
+  }
+
+  if (targetName) {
+    const templates = ACTION_TEMPLATES[category];
+    if (templates && templates.length > 0) {
+      const template = templates[Math.floor(Math.random() * templates.length)];
+      return template
+        .replace("{user}", `**${userName}**`)
+        .replace("{target}", `**${targetName}**`);
+    }
+
+    return `**${userName}** ${category} **${targetName}**!`;
+  }
+
+  const templates = ACTION_TEMPLATES[category];
+  if (templates && templates.length > 0) {
+    const template = templates[Math.floor(Math.random() * templates.length)];
+    return template.replace("{user}", `**${userName}**`);
+  }
+
+  return `**${userName}** ${category}!`;
+}
+
 /**
  * Fetch image from waifu.pics
  * @param {string} category
