@@ -123,32 +123,39 @@ async function handleNsfwButton(interaction) {
       throw new Error("Invalid API response");
     }
 
-    // Create embed with image
-    const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } =
+    // Create Components V2 Container with image
+    const { ContainerBuilder, ButtonBuilder, ButtonStyle, MessageFlags } =
       await import("discord.js");
 
-    const embed = new EmbedBuilder()
-      .setTitle(`🔞 ${type.charAt(0).toUpperCase() + type.slice(1)}`)
-      .setImage(data.message)
-      .setColor(0xff0000)
-      .setFooter({
-        text: `Yêu cầu bởi ${interaction.user.tag} • Nội dung NSFW • 18+`,
-      })
-      .setTimestamp();
+    const container = new ContainerBuilder()
+      .setAccentColor(0xff0000)
+      .addTextDisplayComponents((td) =>
+        td.setContent(`## 🔞 ${type.charAt(0).toUpperCase() + type.slice(1)}`)
+      )
+      .addMediaGalleryComponents((mg) =>
+        mg.addItems((item) => item.setURL(data.message))
+      )
+      .addTextDisplayComponents((td) =>
+        td.setContent(
+          `*Yêu cầu bởi ${interaction.user.tag} • Nội dung NSFW • 18+*`
+        )
+      )
+      .addActionRowComponents((ar) =>
+        ar.addComponents(
+          new ButtonBuilder()
+            .setLabel("Tải xuống")
+            .setStyle(ButtonStyle.Link)
+            .setURL(data.message)
+            .setEmoji("📥")
+        )
+      );
 
-    // Create download button
-    const downloadButton = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setLabel("Tải xuống")
-        .setStyle(ButtonStyle.Link)
-        .setURL(data.message)
-        .setEmoji("📥"),
-    );
-
-    // Send embed with button
+    // Send container with button using components v2
     await interaction.editReply({
-      embeds: [embed],
-      components: [downloadButton],
+      content: null,
+      embeds: null,
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
     });
 
     // Sticky functionality: Delete old menu and resend at bottom
