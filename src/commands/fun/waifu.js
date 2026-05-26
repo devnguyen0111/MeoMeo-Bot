@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 import { customEmbed } from "../../utils/embed.js";
 import config from "../../../config/config.js";
+import { getWaifuImage } from "../../utils/waifuUtils.js";
 
 const SFW_CATEGORIES = [
   "waifu",
@@ -91,21 +92,17 @@ export default {
     }
 
     try {
-      const response = await fetch(
-        `https://api.waifu.pics/${type}/${category}`,
-      );
+      const imageUrl = await getWaifuImage(category, type);
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+      if (!imageUrl) {
+        throw new Error("Failed to fetch image from API");
       }
-
-      const data = await response.json();
 
       const embed = customEmbed({
         title: `${type === "nsfw" ? "🔞 " : ""}${category.charAt(0).toUpperCase() + category.slice(1)}`,
-        image: data.url,
+        image: imageUrl,
         color: config.colors.primary,
-        footer: { text: `Cung cấp bởi waifu.pics • ${type.toUpperCase()}` },
+        footer: { text: `Cung cấp bởi API nguồn • ${type.toUpperCase()}` },
       });
 
       await interaction.editReply({ embeds: [embed] });

@@ -157,23 +157,114 @@ export function buildActionDescription(
   return `**${userName}** ${category}!`;
 }
 
+const SFW_MAPPING = {
+  waifu: "waifu",
+  neko: "neko",
+  shinobu: "waifu",
+  megumin: "waifu",
+  bully: "baka",
+  cuddle: "cuddle",
+  cry: "cry",
+  hug: "hug",
+  awoo: "kitsune",
+  kiss: "kiss",
+  lick: "nom",
+  pat: "pat",
+  smug: "smug",
+  bonk: "bonk",
+  yeet: "yeet",
+  blush: "blush",
+  smile: "smile",
+  wave: "wave",
+  highfive: "highfive",
+  handhold: "handhold",
+  nom: "nom",
+  bite: "bite",
+  glomp: "hug",
+  slap: "slap",
+  kill: "shoot",
+  poke: "poke",
+};
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
- * Fetch image from waifu.pics
+ * Fetch image from anime image APIs (fallback for waifu.pics)
  * @param {string} category
  * @param {string} type 'sfw' or 'nsfw'
  * @returns {Promise<string>} Image URL
  */
 export async function getWaifuImage(category, type = "sfw") {
-  try {
-    const response = await fetch(`https://api.waifu.pics/${type}/${category}`);
-    if (!response.ok) throw new Error(`API Error: ${response.status}`);
-    const data = await response.json();
-    return data.url;
-  } catch (error) {
-    console.error(`Waifu API Error (${category}):`, error);
-    return null; // Return null on error
+  const maxRetries = 2;
+  const headers = {
+    "User-Agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 MeoMeoBot/1.0",
+  };
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      if (type === "sfw") {
+        const endpoint = SFW_MAPPING[category] || category;
+        const response = await fetch(`https://nekos.best/api/v2/${endpoint}`, {
+          headers,
+          signal: AbortSignal.timeout(8000),
+        });
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        const data = await response.json();
+        const url = data.results?.[0]?.url;
+        if (url) return url;
+      } else {
+        // NSFW logic
+        if (category === "waifu") {
+          const response = await fetch(
+            "https://api.waifu.im/images?IncludedTags=waifu&IsNsfw=True",
+            {
+              headers,
+              signal: AbortSignal.timeout(8000),
+            }
+          );
+          if (!response.ok) throw new Error(`API Error: ${response.status}`);
+          const data = await response.json();
+          const url = data.items?.[0]?.url;
+          if (url) return url;
+        } else {
+          // Map category to nekobot types
+          let typeParam = "hentai";
+          if (category === "blowjob") {
+            typeParam = "blowjob";
+          } else if (category === "neko") {
+            typeParam = "hneko";
+          }
+
+          const response = await fetch(
+            `https://nekobot.xyz/api/image?type=${typeParam}`,
+            {
+              headers,
+              signal: AbortSignal.timeout(8000),
+            }
+          );
+          if (!response.ok) throw new Error(`API Error: ${response.status}`);
+          const data = await response.json();
+          const url = data.message;
+          if (url) return url;
+        }
+      }
+      // If we got here but url was empty
+      throw new Error("Empty URL returned from API");
+    } catch (error) {
+      console.warn(
+        `Attempt ${attempt} failed to fetch image for category: ${category} (${type}). Error: ${error.message}`
+      );
+      if (attempt < maxRetries) {
+        await delay(1000 * attempt); // wait 1s, then 2s
+      } else {
+        console.error(`Waifu API Error (${category}):`, error);
+      }
+    }
   }
+  return null; // Return null if all retries fail
 }
+
 
 /**
  * Handle generic anime interaction command
