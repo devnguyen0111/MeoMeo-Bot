@@ -197,8 +197,7 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function getWaifuImage(category, type = "sfw") {
   const maxRetries = 2;
   const headers = {
-    "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 MeoMeoBot/1.0",
+    "User-Agent": "MeoMeoBot/1.0",
   };
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
