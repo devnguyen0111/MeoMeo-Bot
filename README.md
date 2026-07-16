@@ -1,6 +1,6 @@
 # MeoMeo Discord Bot
 
-Discord bot cho một máy chủ với voice leveling, moderation, nhạc YouTube, lệnh giải trí và hành động anime. Xây dựng bằng **discord.js ^14.27** và MongoDB, giao diện dùng **Discord Components V2** (Container, Section, MediaGallery, Buttons, Select Menus, Modals).
+Discord bot cho một máy chủ với voice leveling, moderation, lệnh giải trí và hành động anime. Xây dựng bằng **discord.js ^14.27** và MongoDB, giao diện dùng **Discord Components V2**.
 
 ## Features
 
@@ -28,12 +28,8 @@ Discord bot cho một máy chủ với voice leveling, moderation, nhạc YouTub
 ### Actions
 - `/kiss`, `/hug`, `/pat`, `/slap`, `/poke`, `/cuddle`, `/cry`, `/smile`, `/kill`
 
-### Music
-- `/play`, `/pause`, `/resume`, `/skip`, `/stop`, `/shuffle`
-- `/queue`, `/nowplaying`, `/volume`
-
 ### Utility
-- `/ping`, `/help`, `/status`, `/serverinfo`, `/userinfo`, `/avatar`, `/stayvc`
+- `/ping`, `/help`, `/status`, `/serverinfo`, `/userinfo`, `/avatar`
 
 ## Setup
 
@@ -58,7 +54,6 @@ GUILD_ID=your_server_id_here
 MONGO_URI=mongodb://localhost:27017/meomeo-bot
 
 VOICE_XP_PER_MINUTE=10
-MUSIC_DEFAULT_VOLUME=80
 NEKOBOT_API_KEY=your_nekobot_api_key_here
 ```
 
@@ -77,8 +72,6 @@ Bot dùng `MessageFlags.IsComponentsV2` cho phản hồi slash command. Helpers 
 - `imageCardContainer` - ảnh + mô tả (meme, waifu, avatar...)
 - `successContainer` / `errorContainer` - thông báo ngắn
 - `v2Payload()` - bọc container + flags chuẩn
-
-Modal (ban reason...) vẫn dùng Modal API; không gắn flag V2 cho modal.
 
 ## Project Structure
 
@@ -104,7 +97,7 @@ MeoMeo-Bot/
 
 - Kick Members, Ban Members, Moderate Members
 - Manage Messages, Manage Nicknames
-- View Channels, Send Messages, Connect, Speak
+- View Channels, Send Messages
 - Read Message History
 
 ## Intents
@@ -113,7 +106,7 @@ MeoMeo-Bot/
 
 ## Troubleshooting
 
-**Lệnh không hiện?** Kiểm tra `CLIENT_ID`, `GUILD_ID` và scope `applications.commands`.
+**Lệnh không hiện?** Kiểm tra `CLIENT_ID`, `GUILD_ID` và scope `applications.commands`. Sau khi gỡ lệnh nhạc, chạy `npm run deploy` để xóa slash commands cũ khỏi Discord.
 
 **Voice XP không chạy?** Bật intent `GuildVoiceStates`, kiểm tra MongoDB.
 

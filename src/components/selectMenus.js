@@ -26,10 +26,6 @@ export function helpCategoryMenu() {
       .setDescription("Lệnh tương tác xã hội")
       .setValue("actions"),
     new StringSelectMenuOptionBuilder()
-      .setLabel("🎵 Âm nhạc")
-      .setDescription("Lệnh phát nhạc")
-      .setValue("music"),
-    new StringSelectMenuOptionBuilder()
       .setLabel("🔧 Tiện ích")
       .setDescription("Lệnh tiện ích và thông tin")
       .setValue("utility"),

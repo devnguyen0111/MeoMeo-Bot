@@ -4,23 +4,15 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose";
-import { Player } from "discord-player";
-import extractorPkg from "@discord-player/extractor";
-import { YoutubeExtractor } from "discord-player-youtube";
-import ffmpegStatic from "ffmpeg-static";
 import config from "../config/config.js";
 import logger from "./utils/logger.js";
 import CommandStats from "./models/CommandStats.js";
-import { errorContainer, v2Payload } from "./utils/componentsV2.js";
 
 dotenv.config();
-
-const { DefaultExtractors } = extractorPkg.default || extractorPkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Create Discord client
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -30,7 +22,6 @@ const client = new Client({
   ],
 });
 
-// Initialize commands collection
 client.commands = new Collection();
 client.stats = {
   startedAt: Date.now(),
@@ -38,57 +29,12 @@ client.stats = {
   commandUsage: new Map(),
 };
 
-if (ffmpegStatic && !process.env.FFMPEG_PATH) {
-  process.env.FFMPEG_PATH = ffmpegStatic;
-}
-
-client.player = new Player(client);
-
-const playbackErrorCooldown = new Map();
-
-client.player.events.on("playerError", (queue, error) => {
-  logger.error(`Player error in ${queue.guild.id}:`, error);
-  const guildId = queue?.guild?.id;
-  if (!guildId) {
-    return;
-  }
-
-  const now = Date.now();
-  const lastNotice = playbackErrorCooldown.get(guildId) || 0;
-  if (now - lastNotice < 5000) {
-    return;
-  }
-
-  if (queue?.node?.isPlaying()) {
-    return;
-  }
-
-  playbackErrorCooldown.set(guildId, now);
-
-  const channel = queue?.metadata?.channel;
-  if (!channel) {
-    return;
-  }
-
-  const message = String(error?.message || error || "");
-  const requiresAuth = message.toLowerCase().includes("signed in");
-  const description = requiresAuth
-    ? "Bài này cần phiên YouTube đã đăng nhập. Hãy thử bài khác hoặc thêm cookie."
-    : "Không thể phát bài này. Hãy thử bài khác.";
-
-  channel
-    .send(v2Payload(errorContainer("Phát nhạc thất bại", description)))
-    .catch(() => {});
-});
-
-client.player.events.on("error", (queue, error) => {
-  logger.error(`Queue error in ${queue.guild.id}:`, error);
-});
-
-// Load commands
 async function loadCommands() {
   const commandsPath = path.join(__dirname, "commands");
-  const commandFolders = fs.readdirSync(commandsPath);
+  const commandFolders = fs
+    .readdirSync(commandsPath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
 
   for (const folder of commandFolders) {
     const folderPath = path.join(commandsPath, folder);
@@ -112,7 +58,6 @@ async function loadCommands() {
   logger.info(`Loaded ${client.commands.size} commands`);
 }
 
-// Load events
 async function loadEvents() {
   const eventsPath = path.join(__dirname, "events");
   const eventFiles = fs
@@ -142,7 +87,6 @@ async function loadEvents() {
   logger.info(`Loaded ${eventFiles.length} events`);
 }
 
-// Connect to MongoDB
 async function connectDatabase() {
   try {
     await mongoose.connect(config.mongoUri);
@@ -164,26 +108,6 @@ async function loadCommandStats() {
   client.stats.commandUsage = new Map(doc.commandUsage || []);
 }
 
-async function setupMusicSystem() {
-  try {
-    await client.player.extractors.loadMulti(DefaultExtractors);
-
-    try {
-      await client.player.extractors.register(YoutubeExtractor, {
-        filterAutoplayTracks: true,
-        disableYTJSLog: true,
-      });
-    } catch (error) {
-      logger.warn("Failed to register YouTube extractor:", error);
-    }
-
-    logger.success("Music system initialized");
-  } catch (error) {
-    logger.error("Failed to initialize music system:", error);
-  }
-}
-
-// Graceful shutdown
 function setupGracefulShutdown() {
   const shutdown = async (signal) => {
     logger.info(`${signal} received, shutting down gracefully...`);
@@ -206,28 +130,16 @@ function setupGracefulShutdown() {
   process.on("SIGTERM", () => shutdown("SIGTERM"));
 }
 
-// Main initialization
 async function main() {
   try {
     logger.info("Starting MeoMeo Bot...");
 
-    // Connect to database
     await connectDatabase();
-
-    // Load persistent command stats
     await loadCommandStats();
-
-    // Load commands and events
     await loadCommands();
     await loadEvents();
-
-    // Setup music system
-    await setupMusicSystem();
-
-    // Setup graceful shutdown
     setupGracefulShutdown();
 
-    // Login to Discord
     await client.login(config.token);
   } catch (error) {
     logger.error("Fatal error during initialization:", error);
@@ -235,5 +147,4 @@ async function main() {
   }
 }
 
-// Start the bot
 main();

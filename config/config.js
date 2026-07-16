@@ -44,14 +44,4 @@ export default {
     voice: "🎙️",
     level: "📊",
   },
-
-  // Music Settings
-  music: {
-    defaultVolume: parseInt(process.env.MUSIC_DEFAULT_VOLUME) || 80,
-    leaveOnEmptyCooldown:
-      parseInt(process.env.MUSIC_LEAVE_EMPTY_COOLDOWN) || 60000,
-    leaveOnEndCooldown: parseInt(process.env.MUSIC_LEAVE_END_COOLDOWN) || 60000,
-    leaveOnStopCooldown:
-      parseInt(process.env.MUSIC_LEAVE_STOP_COOLDOWN) || 30000,
-  },
 };
