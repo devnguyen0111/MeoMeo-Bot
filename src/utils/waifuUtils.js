@@ -1,5 +1,9 @@
-import { EmbedBuilder } from "discord.js";
 import config from "../../config/config.js";
+import {
+  errorContainer,
+  imageCardContainer,
+  v2Payload,
+} from "./componentsV2.js";
 
 const ACTION_TEMPLATES = {
   kiss: [
@@ -326,18 +330,23 @@ export async function handleAnimeInteraction(
 
   const imageUrl = await getWaifuImage(category, "sfw");
 
-  const embed = new EmbedBuilder()
-    .setDescription(description)
-    .setColor(config.colors?.primary || 0x00ae86)
-    .setImage(imageUrl)
-    .setTimestamp();
-
   if (!imageUrl) {
-    return interaction.editReply({
-      content: "❌ Không lấy được ảnh. API có thể đang gặp sự cố.",
-      ephemeral: true,
-    });
+    return interaction.editReply(
+      v2Payload(
+        errorContainer(
+          "Lỗi",
+          "Không lấy được ảnh. API có thể đang gặp sự cố.",
+        ),
+        { ephemeral: true },
+      ),
+    );
   }
 
-  await interaction.editReply({ embeds: [embed] });
+  const container = imageCardContainer({
+    description,
+    imageUrl,
+    color: config.colors?.primary || 0x00ae86,
+  });
+
+  await interaction.editReply(v2Payload(container));
 }

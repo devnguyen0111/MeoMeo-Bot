@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, version as djsVersion } from "discord.js";
-import { customEmbed } from "../../utils/embed.js";
+import { cardContainer, v2Payload } from "../../utils/componentsV2.js";
 
 function formatDuration(ms) {
   const totalSeconds = Math.floor(ms / 1000);
@@ -47,7 +47,7 @@ export default {
       .join("\n");
 
     const memory = process.memoryUsage();
-    const embed = customEmbed({
+    const container = cardContainer({
       title: "🤖 Trạng thái bot",
       fields: [
         {
@@ -87,11 +87,10 @@ export default {
         {
           name: "🔥 Lệnh dùng nhiều",
           value: topCommands || "Chưa có dữ liệu.",
-          inline: false,
         },
       ],
     });
 
-    await interaction.reply({ embeds: [embed] });
+    await interaction.reply(v2Payload(container));
   },
 };

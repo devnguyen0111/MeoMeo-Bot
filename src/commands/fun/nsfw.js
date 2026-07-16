@@ -1,44 +1,18 @@
-import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { customEmbed, errorEmbed } from "../../utils/embed.js";
+import { SlashCommandBuilder } from "discord.js";
 import config from "../../../config/config.js";
-
-const IMAGE_TYPES = [
-  "hass",
-  "hmidriff",
-  "pgif",
-  "4k",
-  "hentai",
-  "holo",
-  "hneko",
-  "neko",
-  "hkitsune",
-  "kemonomimi",
-  "anal",
-  "hanal",
-  "gonewild",
-  "kanna",
-  "ass",
-  "pussy",
-  "thigh",
-  "hthigh",
-  "gah",
-  "coffee",
-  "food",
-  "paizuri",
-  "tentacle",
-  "boobs",
-  "hboobs",
-  "yaoi",
-];
+import {
+  errorContainer,
+  imageCardContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 
 const API_URL = "https://nekobot.xyz/api/image";
-const API_KEY = "015445535454455354D6";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("nsfw")
     .setDescription("Get NSFW images (NSFW channels only)")
-    .setNSFW(true) // Mark as NSFW command
+    .setNSFW(true)
     .addStringOption((option) =>
       option
         .setName("type")
@@ -62,23 +36,27 @@ export default {
     ),
 
   async execute(interaction) {
-    // Check if channel is NSFW
     if (!interaction.channel.nsfw) {
-      return interaction.reply({
-        embeds: [errorEmbed("Chỉ NSFW", "Lệnh này chỉ dùng trong kênh NSFW!")],
-        ephemeral: true,
-      });
+      return interaction.reply(
+        v2Payload(
+          errorContainer(
+            "Chỉ NSFW",
+            "Lệnh này chỉ dùng trong kênh NSFW!",
+          ),
+          { ephemeral: true },
+        ),
+      );
     }
 
     await interaction.deferReply();
 
     const type = interaction.options.getString("type");
+    const apiKey = process.env.NEKOBOT_API_KEY;
 
     try {
-      // Fetch image from API
       const response = await fetch(`${API_URL}?type=${type}`, {
         headers: {
-          Authorization: API_KEY,
+          ...(apiKey ? { Authorization: apiKey } : {}),
           "Content-Type": "application/json",
         },
       });
@@ -93,21 +71,21 @@ export default {
         throw new Error("Invalid API response");
       }
 
-      const embed = customEmbed({
+      const container = imageCardContainer({
         title: `🔞 ${type.charAt(0).toUpperCase() + type.slice(1)}`,
-        image: data.message,
+        imageUrl: data.message,
         color: config.colors.error,
-        footer: { text: "Nội dung NSFW • 18+" },
+        footer: "Nội dung NSFW • 18+",
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await interaction.editReply(v2Payload(container));
     } catch (error) {
       console.error("NSFW command error:", error);
-      await interaction.editReply({
-        embeds: [
-          errorEmbed("Lỗi", "Không lấy được ảnh. Vui lòng thử lại sau."),
-        ],
-      });
+      await interaction.editReply(
+        v2Payload(
+          errorContainer("Lỗi", "Không lấy được ảnh. Vui lòng thử lại sau."),
+        ),
+      );
     }
   },
 };

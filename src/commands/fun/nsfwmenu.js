@@ -6,7 +6,7 @@ import {
   ButtonStyle,
   MessageFlags,
 } from "discord.js";
-import { errorEmbed } from "../../utils/embed.js";
+import { errorContainer, v2Payload } from "../../utils/componentsV2.js";
 import config from "../../../config/config.js";
 
 // Helper function to create menu message
@@ -117,10 +117,15 @@ export default {
   async execute(interaction) {
     // Check if channel is NSFW
     if (!interaction.channel.nsfw) {
-      return interaction.reply({
-        embeds: [errorEmbed("Chỉ NSFW", "Lệnh này chỉ dùng trong kênh NSFW!")],
-        ephemeral: true,
-      });
+      return interaction.reply(
+        v2Payload(
+          errorContainer(
+            "Chỉ NSFW",
+            "Lệnh này chỉ dùng trong kênh NSFW!",
+          ),
+          { ephemeral: true },
+        ),
+      );
     }
 
     const menuMessage = createNsfwMenu();

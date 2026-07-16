@@ -1,5 +1,9 @@
 import { SlashCommandBuilder } from "discord.js";
-import { customEmbed, errorEmbed } from "../../utils/embed.js";
+import {
+  cardContainer,
+  errorContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 import config from "../../../config/config.js";
 
 export default {
@@ -11,21 +15,21 @@ export default {
     const queue = interaction.client.player?.nodes.get(interaction.guild.id);
 
     if (!queue?.currentTrack) {
-      await interaction.reply({
-        embeds: [
-          errorEmbed("Không có bài đang phát", "Không có bài nào đang phát."),
-        ],
-        ephemeral: true,
-      });
+      await interaction.reply(
+        v2Payload(
+          errorContainer("Không có bài đang phát", "Không có bài nào đang phát."),
+          { ephemeral: true },
+        ),
+      );
       return;
     }
 
     const track = queue.currentTrack;
-    const embed = customEmbed({
+    const container = cardContainer({
       title: "🎶 Đang phát",
       description: `**${track.title}**`,
       color: config.colors.primary,
-      thumbnail: track.thumbnail,
+      thumbnailUrl: track.thumbnail,
       fields: [
         { name: "Thời lượng", value: track.duration, inline: true },
         {
@@ -36,6 +40,6 @@ export default {
       ],
     });
 
-    await interaction.reply({ embeds: [embed] });
+    await interaction.reply(v2Payload(container));
   },
 };

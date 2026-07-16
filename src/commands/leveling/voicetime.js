@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { customEmbed } from "../../utils/embed.js";
+import { cardContainer, v2Payload } from "../../utils/componentsV2.js";
 import User from "../../models/User.js";
 import config from "../../../config/config.js";
 
@@ -23,22 +23,18 @@ export default {
       await user.save();
     }
 
-    // Reset daily voice time if needed
     user.resetDailyVoiceTime();
     await user.save();
 
-    // Format times
     const totalHours = Math.floor(user.totalVoiceTime / 60);
     const totalMins = user.totalVoiceTime % 60;
     const todayHours = Math.floor(user.voiceTimeToday / 60);
     const todayMins = user.voiceTimeToday % 60;
 
-    // Calculate averages (simplified - could be improved with more data)
-    const avgPerDay = Math.floor(user.totalVoiceTime / 30); // Rough 30-day average
+    const avgPerDay = Math.floor(user.totalVoiceTime / 30);
     const avgHours = Math.floor(avgPerDay / 60);
     const avgMins = avgPerDay % 60;
 
-    // Check if currently in voice
     const guild = interaction.guild;
     const member = await guild.members.fetch(targetUser.id);
     const currentlyInVoice = member.voice.channel !== null;
@@ -46,10 +42,10 @@ export default {
       ? member.voice.channel.name
       : "Không ở voice";
 
-    const embed = customEmbed({
+    const container = cardContainer({
       title: `🎙️ Thống kê voice của ${targetUser.username}`,
       color: config.colors.primary,
-      thumbnail: targetUser.displayAvatarURL({ size: 256 }),
+      thumbnailUrl: targetUser.displayAvatarURL({ size: 256 }),
       fields: [
         {
           name: "📊 Tổng thời gian voice",
@@ -68,7 +64,7 @@ export default {
         },
         {
           name: "🎯 Trạng thái hiện tại",
-          value: currentlyInVoice ? `✅ Đang ở voice` : "⭕ Không ở voice",
+          value: currentlyInVoice ? "✅ Đang ở voice" : "⭕ Không ở voice",
           inline: true,
         },
         { name: "📢 Kênh", value: currentChannel, inline: true },
@@ -78,9 +74,9 @@ export default {
           inline: true,
         },
       ],
-      footer: { text: `Cấp ${user.level} • ${user.xp} XP` },
+      footer: `Cấp ${user.level} • ${user.xp} XP`,
     });
 
-    await interaction.reply({ embeds: [embed] });
+    await interaction.reply(v2Payload(container));
   },
 };

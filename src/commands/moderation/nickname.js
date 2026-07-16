@@ -1,5 +1,9 @@
-import { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } from "discord.js";
-import { successEmbed, errorEmbed } from "../../utils/embed.js";
+import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
+import {
+  errorContainer,
+  successContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -29,61 +33,78 @@ export default {
   async execute(interaction) {
     const target = interaction.options.getUser("user");
     const nickname = interaction.options.getString("nickname");
-    const reason = interaction.options.getString("reason") || `Được thay đổi bởi ${interaction.user.tag}`;
+    const reason =
+      interaction.options.getString("reason") ||
+      `Được thay đổi bởi ${interaction.user.tag}`;
 
-    const member = await interaction.guild.members.fetch(target.id).catch(() => null);
+    const member = await interaction.guild.members
+      .fetch(target.id)
+      .catch(() => null);
 
     if (!member) {
-      return interaction.reply({
-        embeds: [errorEmbed("Lỗi", "Không tìm thấy thành viên này trong máy chủ.")],
-        flags: MessageFlags.Ephemeral,
-      });
+      return interaction.reply(
+        v2Payload(
+          errorContainer("Lỗi", "Không tìm thấy thành viên này trong máy chủ."),
+          { ephemeral: true },
+        ),
+      );
     }
 
-    // Check if bot has ManageNicknames permission
-    if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ManageNicknames)) {
-      return interaction.reply({
-        embeds: [errorEmbed("Thiếu quyền", "Mình không có quyền quản lý biệt danh trong máy chủ này.")],
-        flags: MessageFlags.Ephemeral,
-      });
+    if (
+      !interaction.guild.members.me.permissions.has(
+        PermissionFlagsBits.ManageNicknames,
+      )
+    ) {
+      return interaction.reply(
+        v2Payload(
+          errorContainer(
+            "Thiếu quyền",
+            "Mình không có quyền quản lý biệt danh trong máy chủ này.",
+          ),
+          { ephemeral: true },
+        ),
+      );
     }
 
-    // Check if target is the server owner
     if (member.id === interaction.guild.ownerId) {
-      return interaction.reply({
-        embeds: [errorEmbed("Không thể đổi biệt danh", "Không thể thay đổi biệt danh của chủ sở hữu máy chủ.")],
-        flags: MessageFlags.Ephemeral,
-      });
+      return interaction.reply(
+        v2Payload(
+          errorContainer(
+            "Không thể đổi biệt danh",
+            "Không thể thay đổi biệt danh của chủ sở hữu máy chủ.",
+          ),
+          { ephemeral: true },
+        ),
+      );
     }
 
-    // Check if target is manageable by bot
     if (!member.manageable) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed(
+      return interaction.reply(
+        v2Payload(
+          errorContainer(
             "Không thể đổi biệt danh",
             "Mình không có quyền chỉnh sửa thành viên này (có thể do thứ bậc vai trò cao hơn bot).",
           ),
-        ],
-        flags: MessageFlags.Ephemeral,
-      });
+          { ephemeral: true },
+        ),
+      );
     }
 
-    // Check role hierarchy for the interaction member (except if editing themselves or owner is executing)
     if (
       member.id !== interaction.user.id &&
-      member.roles.highest.position >= interaction.member.roles.highest.position &&
+      member.roles.highest.position >=
+        interaction.member.roles.highest.position &&
       interaction.user.id !== interaction.guild.ownerId
     ) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed(
+      return interaction.reply(
+        v2Payload(
+          errorContainer(
             "Không thể đổi biệt danh",
             "Bạn không thể đổi biệt danh của thành viên này do thứ bậc vai trò của họ cao hơn hoặc bằng bạn.",
           ),
-        ],
-        flags: MessageFlags.Ephemeral,
-      });
+          { ephemeral: true },
+        ),
+      );
     }
 
     try {
@@ -94,20 +115,22 @@ export default {
         ? `đã đổi biệt danh của **${target.tag}** từ **${oldNickname}** thành **${nickname}**`
         : `đã xóa biệt danh của **${target.tag}** (trước đó là **${oldNickname}**)`;
 
-      await interaction.reply({
-        embeds: [
-          successEmbed(
+      await interaction.reply(
+        v2Payload(
+          successContainer(
             "Thay đổi biệt danh thành công",
-            `${actionText}.\n**Lý do:** ${reason}`
+            `${actionText}.\n**Lý do:** ${reason}`,
           ),
-        ],
-        flags: MessageFlags.Ephemeral,
-      });
+          { ephemeral: true },
+        ),
+      );
     } catch (error) {
-      await interaction.reply({
-        embeds: [errorEmbed("Lỗi", "Không thể thay đổi biệt danh: " + error.message)],
-        flags: MessageFlags.Ephemeral,
-      });
+      await interaction.reply(
+        v2Payload(
+          errorContainer("Lỗi", "Không thể thay đổi biệt danh: " + error.message),
+          { ephemeral: true },
+        ),
+      );
     }
   },
 };

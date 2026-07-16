@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
-import { customEmbed } from "../../utils/embed.js";
 import buttons from "../../components/buttons.js";
-import { awaitButton } from "../../utils/collectors.js";
 import User from "../../models/User.js";
+import { cardContainer, v2Flags, v2Payload } from "../../utils/componentsV2.js";
 import config from "../../../config/config.js";
 
 const USERS_PER_PAGE = 10;
@@ -16,13 +15,21 @@ export default {
     const allUsers = await User.find({}).sort({ level: -1, xp: -1 });
 
     if (allUsers.length === 0) {
-      return interaction.reply("Chưa có ai trong bảng xếp hạng!");
+      return interaction.reply(
+        v2Payload(
+          cardContainer({
+            title: "🏆 Bảng xếp hạng voice",
+            description: "Chưa có ai trong bảng xếp hạng!",
+            color: config.colors.primary,
+          }),
+        ),
+      );
     }
 
     const totalPages = Math.ceil(allUsers.length / USERS_PER_PAGE);
     let currentPage = 0;
 
-    const generateEmbed = async (page) => {
+    const generateContainer = async (page) => {
       const start = page * USERS_PER_PAGE;
       const end = start + USERS_PER_PAGE;
       const pageUsers = allUsers.slice(start, end);
@@ -52,30 +59,27 @@ export default {
         }
       }
 
-      return customEmbed({
+      return cardContainer({
         title: "🏆 Bảng xếp hạng voice",
         description: description || "Không tìm thấy người dùng",
         color: config.colors.primary,
-        footer: { text: `Trang ${page + 1} / ${totalPages}` },
+        footer: `Trang ${page + 1} / ${totalPages}`,
+        rows:
+          totalPages > 1
+            ? [buttons.pagination(page, totalPages, "leaderboard")]
+            : [],
       });
     };
 
-    const embed = await generateEmbed(currentPage);
-    const navButtons = buttons.pagination(
-      currentPage,
-      totalPages,
-      "leaderboard",
-    );
+    const container = await generateContainer(currentPage);
 
     const message = await interaction.reply({
-      embeds: [embed],
-      components: totalPages > 1 ? [navButtons] : [],
+      ...v2Payload(container),
       fetchReply: true,
     });
 
     if (totalPages <= 1) return;
 
-    // Handle pagination
     const collector = message.createMessageComponentCollector({
       filter: (i) => i.user.id === interaction.user.id,
       time: 120000,
@@ -90,21 +94,18 @@ export default {
         currentPage = 0;
       }
 
-      const newEmbed = await generateEmbed(currentPage);
-      const newButtons = buttons.pagination(
-        currentPage,
-        totalPages,
-        "leaderboard",
-      );
+      const newContainer = await generateContainer(currentPage);
 
-      await buttonInteraction.update({
-        embeds: [newEmbed],
-        components: [newButtons],
-      });
+      await buttonInteraction.update(v2Payload(newContainer));
     });
 
     collector.on("end", () => {
-      message.edit({ components: [] }).catch(() => {});
+      message
+        .edit({
+          components: [container],
+          flags: v2Flags(),
+        })
+        .catch(() => {});
     });
   },
 };

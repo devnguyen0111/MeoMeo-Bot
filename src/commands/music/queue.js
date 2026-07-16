@@ -1,6 +1,11 @@
 import { SlashCommandBuilder } from "discord.js";
-import { customEmbed, errorEmbed } from "../../utils/embed.js";
 import buttons from "../../components/buttons.js";
+import {
+  cardContainer,
+  errorContainer,
+  v2Flags,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 import config from "../../../config/config.js";
 
 export default {
@@ -12,12 +17,12 @@ export default {
     const queue = interaction.client.player?.nodes.get(interaction.guild.id);
 
     if (!queue?.currentTrack) {
-      await interaction.reply({
-        embeds: [
-          errorEmbed("Hàng đợi trống", "Không có bài nào trong hàng đợi."),
-        ],
-        ephemeral: true,
-      });
+      await interaction.reply(
+        v2Payload(
+          errorContainer("Hàng đợi trống", "Không có bài nào trong hàng đợi."),
+          { ephemeral: true },
+        ),
+      );
       return;
     }
 
@@ -26,7 +31,7 @@ export default {
     const totalPages = Math.max(Math.ceil(tracks.length / pageSize), 1);
     let currentPage = 0;
 
-    const buildEmbed = (page) => {
+    const buildContainer = (page) => {
       const start = page * pageSize;
       const pageTracks = tracks.slice(start, start + pageSize);
       const description = pageTracks.length
@@ -38,7 +43,7 @@ export default {
             .join("\n")
         : "Không còn bài nào trong hàng đợi.";
 
-      return customEmbed({
+      return cardContainer({
         title: "🎵 Hàng đợi hiện tại",
         description,
         color: config.colors.primary,
@@ -52,17 +57,15 @@ export default {
             value: `Bài: **${tracks.length}** | Trang **${page + 1}**/**${totalPages}**`,
           },
         ],
+        rows:
+          totalPages > 1
+            ? [buttons.pagination(page, totalPages, "queue")]
+            : [],
       });
     };
 
-    const components =
-      totalPages > 1
-        ? [buttons.pagination(currentPage, totalPages, "queue")]
-        : [];
-
     const message = await interaction.reply({
-      embeds: [buildEmbed(currentPage)],
-      components,
+      ...v2Payload(buildContainer(currentPage)),
       fetchReply: true,
     });
 
@@ -85,14 +88,16 @@ export default {
         currentPage = 0;
       }
 
-      await buttonInteraction.update({
-        embeds: [buildEmbed(currentPage)],
-        components: [buttons.pagination(currentPage, totalPages, "queue")],
-      });
+      await buttonInteraction.update(v2Payload(buildContainer(currentPage)));
     });
 
     collector.on("end", async () => {
-      await message.edit({ components: [] }).catch(() => {});
+      await message
+        .edit({
+          components: [buildContainer(currentPage)],
+          flags: v2Flags(),
+        })
+        .catch(() => {});
     });
   },
 };

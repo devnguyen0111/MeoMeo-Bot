@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
-import { customEmbed } from "../../utils/embed.js";
 import selectMenus from "../../components/selectMenus.js";
 import { awaitSelectMenu, handleTimeout } from "../../utils/collectors.js";
+import { cardContainer, v2Payload } from "../../utils/componentsV2.js";
 import config from "../../../config/config.js";
 
 const commandCategories = {
@@ -12,6 +12,7 @@ const commandCategories = {
       { name: "/ban", description: "Cấm một thành viên khỏi máy chủ" },
       { name: "/mute", description: "Timeout một thành viên" },
       { name: "/clear", description: "Xóa hàng loạt tin nhắn" },
+      { name: "/nickname", description: "Đổi hoặc xóa biệt danh thành viên" },
     ],
   },
   leveling: {
@@ -74,39 +75,42 @@ const commandCategories = {
   },
 };
 
+function buildHelpContainer(title, description, fields = [], rows = []) {
+  return cardContainer({
+    title,
+    description,
+    color: config.colors.primary,
+    fields,
+    rows,
+  });
+}
+
 export default {
   data: new SlashCommandBuilder()
     .setName("help")
     .setDescription("Show all available commands"),
 
   async execute(interaction) {
-    const embed = customEmbed({
-      title: "📚 MeoMeo Bot - Trợ giúp",
-      description: "Chọn danh mục bên dưới để xem lệnh",
-      color: config.colors.primary,
-      fields: [
-        {
-          name: "🛡️ Quản trị",
-          value: "Lệnh quản trị máy chủ",
-          inline: true,
-        },
+    const menu = selectMenus.helpCategory();
+    const container = buildHelpContainer(
+      "📚 MeoMeo Bot - Trợ giúp",
+      "Chọn danh mục bên dưới để xem lệnh",
+      [
+        { name: "🛡️ Quản trị", value: "Lệnh quản trị máy chủ", inline: true },
         { name: "📊 Cấp độ", value: "Lệnh xếp hạng voice", inline: true },
         { name: "🎮 Giải trí", value: "Lệnh giải trí", inline: true },
         { name: "🎭 Hành động", value: "Lệnh tương tác", inline: true },
         { name: "🎵 Âm nhạc", value: "Trình phát nhạc YouTube", inline: true },
         { name: "🔧 Tiện ích", value: "Lệnh thông tin", inline: true },
       ],
-    });
-
-    const menu = selectMenus.helpCategory();
+      [menu],
+    );
 
     const message = await interaction.reply({
-      embeds: [embed],
-      components: [menu],
+      ...v2Payload(container),
       fetchReply: true,
     });
 
-    // Collector for category selection
     const menuInteraction = await awaitSelectMenu(
       message,
       interaction.user.id,
@@ -120,20 +124,15 @@ export default {
 
     const category = menuInteraction.values[0];
     const categoryData = commandCategories[category];
-
-    const categoryEmbed = customEmbed({
-      title: categoryData.title,
-      description: "Các lệnh trong danh mục này:",
-      color: config.colors.primary,
-      fields: categoryData.commands.map((cmd) => ({
+    const categoryContainer = buildHelpContainer(
+      categoryData.title,
+      "Các lệnh trong danh mục này:",
+      categoryData.commands.map((cmd) => ({
         name: cmd.name,
         value: cmd.description,
       })),
-    });
+    );
 
-    await menuInteraction.update({
-      embeds: [categoryEmbed],
-      components: [],
-    });
+    await menuInteraction.update(v2Payload(categoryContainer));
   },
 };

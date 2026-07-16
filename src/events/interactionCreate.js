@@ -1,46 +1,28 @@
 import { Events } from "discord.js";
 import logger from "../utils/logger.js";
 import CommandStats from "../models/CommandStats.js";
+import {
+  errorContainer,
+  v2Payload,
+} from "../utils/componentsV2.js";
 
 export default {
   name: Events.InteractionCreate,
   async execute(interaction) {
-    // Handle slash commands
     if (interaction.isChatInputCommand()) {
       await handleCommand(interaction);
-    }
-
-    // Handle button interactions
-    else if (interaction.isButton()) {
-      // Handle streak button
+    } else if (interaction.isButton()) {
       if (interaction.customId.startsWith("streak_claim")) {
         const { handleStreakClaim } = await import("../commands/fun/streak.js");
         await handleStreakClaim(interaction);
         return;
       }
 
-      // Handle NSFW buttons
       if (interaction.customId.startsWith("nsfw_")) {
         await handleNsfwButton(interaction);
         return;
       }
 
-      // Other button interactions are handled within command files
-      // using collectors, so we don't need to handle them here
-      return;
-    }
-
-    // Handle select menu interactions
-    else if (interaction.isStringSelectMenu()) {
-      // Select menu interactions are handled within command files
-      // using collectors, so we don't need to handle them here
-      return;
-    }
-
-    // Handle modal submissions
-    else if (interaction.isModalSubmit()) {
-      // Modal submissions are handled within command files
-      // using collectors, so we don't need to handle them here
       return;
     }
   },
@@ -82,10 +64,10 @@ async function handleCommand(interaction) {
   } catch (error) {
     logger.error(`Error executing ${interaction.commandName}:`, error);
 
-    const errorMessage = {
-      content: "❌ Đã có lỗi khi thực thi lệnh này!",
-      ephemeral: true,
-    };
+    const errorMessage = v2Payload(
+      errorContainer("Lỗi", "Đã có lỗi khi thực thi lệnh này!"),
+      { ephemeral: true },
+    );
 
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp(errorMessage);
@@ -96,19 +78,17 @@ async function handleCommand(interaction) {
 }
 
 async function handleNsfwButton(interaction) {
-  // Extract type from button customId (e.g., nsfw_hentai -> hentai)
   const type = interaction.customId.replace("nsfw_", "");
 
-  await interaction.deferReply(); // Public reply
+  await interaction.deferReply();
 
   const API_URL = "https://nekobot.xyz/api/image";
-  const API_KEY = "015445535454455354D6";
+  const API_KEY = process.env.NEKOBOT_API_KEY;
 
   try {
-    // Fetch image from API
     const response = await fetch(`${API_URL}?type=${type}`, {
       headers: {
-        Authorization: API_KEY,
+        ...(API_KEY ? { Authorization: API_KEY } : {}),
         "Content-Type": "application/json",
       },
     });
@@ -123,22 +103,21 @@ async function handleNsfwButton(interaction) {
       throw new Error("Invalid API response");
     }
 
-    // Create Components V2 Container with image
     const { ContainerBuilder, ButtonBuilder, ButtonStyle, MessageFlags } =
       await import("discord.js");
 
     const container = new ContainerBuilder()
       .setAccentColor(0xff0000)
       .addTextDisplayComponents((td) =>
-        td.setContent(`## 🔞 ${type.charAt(0).toUpperCase() + type.slice(1)}`)
+        td.setContent(`## 🔞 ${type.charAt(0).toUpperCase() + type.slice(1)}`),
       )
       .addMediaGalleryComponents((mg) =>
-        mg.addItems((item) => item.setURL(data.message))
+        mg.addItems((item) => item.setURL(data.message)),
       )
       .addTextDisplayComponents((td) =>
         td.setContent(
-          `*Yêu cầu bởi ${interaction.user.tag} • Nội dung NSFW • 18+*`
-        )
+          `*Yêu cầu bởi ${interaction.user.tag} • Nội dung NSFW • 18+*`,
+        ),
       )
       .addActionRowComponents((ar) =>
         ar.addComponents(
@@ -146,37 +125,31 @@ async function handleNsfwButton(interaction) {
             .setLabel("Tải xuống")
             .setStyle(ButtonStyle.Link)
             .setURL(data.message)
-            .setEmoji("📥")
-        )
+            .setEmoji("📥"),
+        ),
       );
 
-    // Send container with button using components v2
     await interaction.editReply({
-      content: null,
-      embeds: null,
       components: [container],
       flags: MessageFlags.IsComponentsV2,
     });
 
-    // Sticky functionality: Delete old menu and resend at bottom
     try {
-      // Delete the original menu message
       await interaction.message.delete();
 
-      // Import and resend menu
       const { createNsfwMenu } = await import("../commands/fun/nsfwmenu.js");
       const menuMessage = createNsfwMenu();
 
-      // Send new menu at bottom of channel
       await interaction.channel.send(menuMessage);
     } catch (error) {
-      // If delete/resend fails, just continue (menu stays)
       logger.error("Failed to refresh menu:", error);
     }
   } catch (error) {
     logger.error("NSFW button error:", error);
-    await interaction.editReply({
-      content: "❌ Không lấy được ảnh. Vui lòng thử lại sau.",
-    });
+    await interaction.editReply(
+      v2Payload(
+        errorContainer("Lỗi", "Không lấy được ảnh. Vui lòng thử lại sau."),
+      ),
+    );
   }
 }

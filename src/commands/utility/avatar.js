@@ -1,6 +1,14 @@
-import { SlashCommandBuilder } from "discord.js";
-import { customEmbed } from "../../utils/embed.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import {
+  SlashCommandBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+} from "discord.js";
+import {
+  imageCardContainer,
+  v2Flags,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 import config from "../../../config/config.js";
 
 export default {
@@ -16,23 +24,9 @@ export default {
 
   async execute(interaction) {
     const user = interaction.options.getUser("user") || interaction.user;
-
-    // Get avatar URLs with different sizes
     const avatarURL = user.displayAvatarURL({ dynamic: true, size: 1024 });
-    const formats = ["webp", "png", "jpg"];
-    if (user.avatar && user.avatar.startsWith("a_")) {
-      formats.push("gif"); // Add gif for animated avatars
-    }
 
-    const embed = customEmbed({
-      title: `Ảnh đại diện của ${user.username}`,
-      color: config.colors.primary,
-      image: avatarURL,
-      description: `[Tải xuống](${avatarURL})`,
-    });
-
-    // Size buttons
-    const row1 = new ActionRowBuilder().addComponents(
+    const sizeRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setLabel("256")
         .setStyle(ButtonStyle.Secondary)
@@ -51,13 +45,25 @@ export default {
         .setCustomId(`avatar_2048_${user.id}`),
     );
 
+    const buildContainer = (size = 1024) => {
+      const url = user.displayAvatarURL({ dynamic: true, size });
+      return imageCardContainer({
+        title:
+          size === 1024
+            ? `Ảnh đại diện của ${user.username}`
+            : `Ảnh đại diện của ${user.username} (${size}x${size})`,
+        description: `[Tải xuống](${url})`,
+        color: config.colors.primary,
+        imageUrl: url,
+        rows: [sizeRow],
+      });
+    };
+
     const message = await interaction.reply({
-      embeds: [embed],
-      components: [row1],
+      ...v2Payload(buildContainer()),
       fetchReply: true,
     });
 
-    // Handle button clicks
     const collector = message.createMessageComponentCollector({
       filter: (i) =>
         i.user.id === interaction.user.id && i.customId.startsWith("avatar_"),
@@ -65,21 +71,17 @@ export default {
     });
 
     collector.on("collect", async (buttonInteraction) => {
-      const size = parseInt(buttonInteraction.customId.split("_")[1]);
-      const newURL = user.displayAvatarURL({ dynamic: true, size });
-
-      const newEmbed = customEmbed({
-        title: `Ảnh đại diện của ${user.username} (${size}x${size})`,
-        color: config.colors.primary,
-        image: newURL,
-        description: `[Tải xuống](${newURL})`,
-      });
-
-      await buttonInteraction.update({ embeds: [newEmbed] });
+      const size = parseInt(buttonInteraction.customId.split("_")[1], 10);
+      await buttonInteraction.update(v2Payload(buildContainer(size)));
     });
 
     collector.on("end", () => {
-      message.edit({ components: [] }).catch(() => {});
+      message
+        .edit({
+          components: [buildContainer()],
+          flags: v2Flags(),
+        })
+        .catch(() => {});
     });
   },
 };

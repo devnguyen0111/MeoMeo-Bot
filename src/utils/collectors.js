@@ -1,5 +1,5 @@
 import { ComponentType } from "discord.js";
-import { errorEmbed } from "./embed.js";
+import { errorContainer, v2Flags } from "./componentsV2.js";
 
 /**
  * Create a button collector with timeout handling
@@ -93,13 +93,13 @@ export async function awaitSelectMenu(message, userId, timeoutSeconds = 30) {
 export async function handleTimeout(message) {
   try {
     await message.edit({
-      components: [],
-      embeds: [
-        errorEmbed(
+      components: [
+        errorContainer(
           "Hết thời gian",
           "Tương tác đã hết hạn. Vui lòng chạy lại lệnh.",
         ),
       ],
+      flags: v2Flags(),
     });
   } catch (error) {
     // Message might be deleted, ignore

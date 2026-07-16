@@ -1,5 +1,9 @@
 import { SlashCommandBuilder } from "discord.js";
-import { infoEmbed, successEmbed, errorEmbed } from "../../utils/embed.js";
+import {
+  cardContainer,
+  errorContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 import User from "../../models/User.js";
 import buttons from "../../components/buttons.js";
 
@@ -84,16 +88,19 @@ function applyStreakClaim(user, now) {
   return { usedRestore: false };
 }
 
-function buildStatusEmbed(user, now, canClaim) {
+function buildStatusContainer(userId, user, now, canClaim) {
   const description = canClaim
     ? "Bấm nút bên dưới để nhận streak."
     : "Bạn đã nhận hôm nay rồi!\nHãy quay lại vào ngày mai.";
 
-  return infoEmbed(
-    "Minigame Streak",
-    `${description}\n\nStreak: **${user.streakCount || 0}** ngày` +
+  return cardContainer({
+    title: "Minigame Streak",
+    description:
+      `${description}\n\nStreak: **${user.streakCount || 0}** ngày` +
       `\nSố lần khôi phục còn lại trong tháng: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**`,
-  );
+    color: 0x5865f2,
+    rows: [buttons.streakClaim(canClaim, userId)],
+  });
 }
 
 export default {
@@ -112,13 +119,9 @@ export default {
     }
 
     const canClaim = canClaimStreak(user, now);
-    const embed = buildStatusEmbed(user, now, canClaim);
-    const claimButton = buttons.streakClaim(canClaim, userId);
+    const container = buildStatusContainer(userId, user, now, canClaim);
 
-    await interaction.reply({
-      embeds: [embed],
-      components: [claimButton],
-    });
+    await interaction.reply(v2Payload(container));
   },
 };
 
@@ -127,11 +130,12 @@ export async function handleStreakClaim(interaction) {
   const targetUserId = interaction.customId.split("_").slice(2).join("_");
 
   if (targetUserId && targetUserId !== userId) {
-    return interaction.reply({
-      embeds: [
-        errorEmbed("Không phải cho bạn", "Nút này thuộc về người khác."),
-      ],
-    });
+    return interaction.reply(
+      v2Payload(
+        errorContainer("Không phải cho bạn", "Nút này thuộc về người khác."),
+        { ephemeral: true },
+      ),
+    );
   }
 
   let user = await User.findOne({ userId });
@@ -141,13 +145,8 @@ export async function handleStreakClaim(interaction) {
 
   const now = new Date();
   if (!canClaimStreak(user, now)) {
-    const embed = buildStatusEmbed(user, now, false);
-    const claimButton = buttons.streakClaim(false, userId);
-
-    await interaction.update({
-      embeds: [embed],
-      components: [claimButton],
-    });
+    const container = buildStatusContainer(userId, user, now, false);
+    await interaction.update(v2Payload(container));
     return;
   }
 
@@ -156,16 +155,15 @@ export async function handleStreakClaim(interaction) {
   user.streakLastClaim = now;
   await user.save();
 
-  const embed = successEmbed(
-    "Đã nhận streak!",
-    `Streak: **${user.streakCount}** ngày` +
+  const container = cardContainer({
+    title: "Đã nhận streak!",
+    description:
+      `Streak: **${user.streakCount}** ngày` +
       `${usedRestore ? "\n🧩 Đã dùng 1 lượt khôi phục streak." : ""}` +
       `\nSố lần khôi phục còn lại trong tháng: **${getRestoresLeft(user, now)}/${MAX_STREAK_RESTORES}**`,
-  );
-
-  const claimButton = buttons.streakClaim(false, userId);
-  await interaction.update({
-    embeds: [embed],
-    components: [claimButton],
+    color: 0x57f287,
+    rows: [buttons.streakClaim(false, userId)],
   });
+
+  await interaction.update(v2Payload(container));
 }

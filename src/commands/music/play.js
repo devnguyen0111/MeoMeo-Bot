@@ -1,6 +1,10 @@
 import { SlashCommandBuilder } from "discord.js";
 import { QueryType } from "discord-player";
-import { successEmbed, errorEmbed } from "../../utils/embed.js";
+import {
+  errorContainer,
+  successContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 import logger from "../../utils/logger.js";
 import config from "../../../config/config.js";
 
@@ -20,23 +24,23 @@ export default {
     const voiceChannel = interaction.member?.voice?.channel;
 
     if (!voiceChannel) {
-      await interaction.reply({
-        embeds: [
-          errorEmbed("Chưa vào kênh voice", "Vui lòng vào kênh voice trước."),
-        ],
-        ephemeral: true,
-      });
+      await interaction.reply(
+        v2Payload(
+          errorContainer("Chưa vào kênh voice", "Vui lòng vào kênh voice trước."),
+          { ephemeral: true },
+        ),
+      );
       return;
     }
 
     const player = interaction.client.player;
     if (!player) {
-      await interaction.reply({
-        embeds: [
-          errorEmbed("Nhạc chưa sẵn sàng", "Hệ thống nhạc chưa sẵn sàng."),
-        ],
-        ephemeral: true,
-      });
+      await interaction.reply(
+        v2Payload(
+          errorContainer("Nhạc chưa sẵn sàng", "Hệ thống nhạc chưa sẵn sàng."),
+          { ephemeral: true },
+        ),
+      );
       return;
     }
 
@@ -45,15 +49,15 @@ export default {
       existingQueue?.channel &&
       existingQueue.channel.id !== voiceChannel.id
     ) {
-      await interaction.reply({
-        embeds: [
-          errorEmbed(
+      await interaction.reply(
+        v2Payload(
+          errorContainer(
             "Đang phát ở kênh khác",
             "Mình đang phát ở kênh voice khác.",
           ),
-        ],
-        ephemeral: true,
-      });
+          { ephemeral: true },
+        ),
+      );
       return;
     }
 
@@ -101,11 +105,11 @@ export default {
       } else {
         logger.warn(`No results for query: ${query}`);
       }
-      await interaction.editReply({
-        embeds: [
-          errorEmbed("Không có kết quả", "Mình không tìm thấy kết quả nào."),
-        ],
-      });
+      await interaction.editReply(
+        v2Payload(
+          errorContainer("Không có kết quả", "Mình không tìm thấy kết quả nào."),
+        ),
+      );
       return;
     }
 
@@ -137,11 +141,11 @@ export default {
       }
     } catch (error) {
       queue.delete();
-      await interaction.editReply({
-        embeds: [
-          errorEmbed("Kết nối thất bại", "Mình không thể vào kênh voice."),
-        ],
-      });
+      await interaction.editReply(
+        v2Payload(
+          errorContainer("Kết nối thất bại", "Mình không thể vào kênh voice."),
+        ),
+      );
       return;
     }
 
@@ -165,38 +169,38 @@ export default {
         if (!hadExistingQueue) {
           queue.tracks.clear();
         }
-        await interaction.editReply({
-          embeds: [
-            errorEmbed(
+        await interaction.editReply(
+          v2Payload(
+            errorContainer(
               "Phát thất bại",
               "Mình không thể phát bài này. Vui lòng thử bài khác.",
             ),
-          ],
-        });
+          ),
+        );
         return;
       }
     }
 
     if (isPlaylist) {
-      await interaction.editReply({
-        embeds: [
-          successEmbed(
+      await interaction.editReply(
+        v2Payload(
+          successContainer(
             "Đã thêm playlist",
             `Đã thêm **${searchResult.playlist.title}** với **${searchResult.tracks.length}** bài.`,
           ),
-        ],
-      });
+        ),
+      );
       return;
     }
 
     const track = searchResult.tracks[0];
-    await interaction.editReply({
-      embeds: [
-        successEmbed(
+    await interaction.editReply(
+      v2Payload(
+        successContainer(
           "Đã thêm vào hàng đợi",
           `Đã thêm **${track.title}** vào hàng đợi.`,
         ),
-      ],
-    });
+      ),
+    );
   },
 };

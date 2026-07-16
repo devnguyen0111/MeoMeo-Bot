@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { customEmbed } from "../../utils/embed.js";
+import { cardContainer, v2Payload } from "../../utils/componentsV2.js";
 import User from "../../models/User.js";
 import config from "../../../config/config.js";
 
@@ -17,35 +17,26 @@ export default {
   async execute(interaction) {
     const targetUser = interaction.options.getUser("user") || interaction.user;
     const member = await interaction.guild.members.fetch(targetUser.id);
+    const userData = await User.findOne({ userId: targetUser.id });
 
-    // Get user data from database
-    let userData = await User.findOne({ userId: targetUser.id });
+    const fields = [
+      {
+        name: "🆔 ID người dùng",
+        value: `\`${targetUser.id}\``,
+        inline: true,
+      },
+      {
+        name: "📅 Ngày tạo tài khoản",
+        value: `<t:${Math.floor(targetUser.createdTimestamp / 1000)}:R>`,
+        inline: true,
+      },
+      {
+        name: "📥 Ngày vào máy chủ",
+        value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`,
+        inline: true,
+      },
+    ];
 
-    const embed = customEmbed({
-      title: `${targetUser.tag}`,
-      thumbnail: targetUser.displayAvatarURL({ dynamic: true, size: 256 }),
-      color: member.displayColor || config.colors.primary,
-      fields: [
-        {
-          name: "🆔 ID người dùng",
-          value: `\`${targetUser.id}\``,
-          inline: true,
-        },
-        {
-          name: "📅 Ngày tạo tài khoản",
-          value: `<t:${Math.floor(targetUser.createdTimestamp / 1000)}:R>`,
-          inline: true,
-        },
-        {
-          name: "📥 Ngày vào máy chủ",
-          value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`,
-          inline: true,
-        },
-        { name: "\u200b", value: "\u200b", inline: false },
-      ],
-    });
-
-    // Add roles
     const roles = member.roles.cache
       .filter((role) => role.id !== interaction.guild.id)
       .sort((a, b) => b.position - a.position)
@@ -53,38 +44,36 @@ export default {
       .slice(0, 10);
 
     if (roles.length > 0) {
-      embed.addFields({
+      fields.push({
         name: `🎭 Vai trò [${member.roles.cache.size - 1}]`,
         value: roles.join(", ") + (member.roles.cache.size > 11 ? "..." : ""),
       });
     }
 
-    // Add bot stats
     if (userData) {
-      const statsFields = [];
-
-      if (userData) {
-        statsFields.push({
+      const hours = Math.floor(userData.totalVoiceTime / 60);
+      const mins = userData.totalVoiceTime % 60;
+      fields.push(
+        {
           name: "📊 Cấp & XP",
           value: `Cấp: **${userData.level}**\nXP: **${userData.xp}**`,
           inline: true,
-        });
-
-        const hours = Math.floor(userData.totalVoiceTime / 60);
-        const mins = userData.totalVoiceTime % 60;
-        statsFields.push({
+        },
+        {
           name: "🎙️ Thời gian voice",
           value: `${hours}h ${mins}m`,
           inline: true,
-        });
-      }
-
-      if (statsFields.length > 0) {
-        embed.addFields({ name: "\u200b", value: "\u200b", inline: false });
-        embed.addFields(statsFields);
-      }
+        },
+      );
     }
 
-    await interaction.reply({ embeds: [embed] });
+    const container = cardContainer({
+      title: targetUser.tag,
+      color: member.displayColor || config.colors.primary,
+      thumbnailUrl: targetUser.displayAvatarURL({ dynamic: true, size: 256 }),
+      fields,
+    });
+
+    await interaction.reply(v2Payload(container));
   },
 };

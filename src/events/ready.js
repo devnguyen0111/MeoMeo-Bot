@@ -1,9 +1,10 @@
-import { EmbedBuilder, Events } from "discord.js";
+import { Events } from "discord.js";
 import { REST, Routes } from "discord.js";
 import cron from "node-cron";
 import config from "../../config/config.js";
 import logger from "../utils/logger.js";
 import { buildActionDescription, getWaifuImage } from "../utils/waifuUtils.js";
+import { imageCardContainer, v2Payload } from "../utils/componentsV2.js";
 
 const KISS_CHANNEL_ID = "1467570083625828576";
 const KISSER_ID = "229203044372316160";
@@ -88,12 +89,12 @@ function scheduleDailyKiss(client) {
         const imageUrl = await getWaifuImage("kiss", "sfw");
 
         if (imageUrl) {
-          const embed = new EmbedBuilder()
-            .setDescription(description)
-            .setColor(config.colors?.primary || 0x00ae86)
-            .setImage(imageUrl)
-            .setTimestamp();
-          await channel.send({ embeds: [embed] });
+          const container = imageCardContainer({
+            description,
+            imageUrl,
+            color: config.colors?.primary || 0x00ae86,
+          });
+          await channel.send(v2Payload(container));
         } else {
           await channel.send({ content: description });
           logger.warn("Daily kiss image unavailable, sent text only.");

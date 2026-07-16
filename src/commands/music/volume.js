@@ -1,5 +1,9 @@
 import { SlashCommandBuilder } from "discord.js";
-import { successEmbed, errorEmbed } from "../../utils/embed.js";
+import {
+  errorContainer,
+  successContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -19,21 +23,21 @@ export default {
     const queue = interaction.client.player?.nodes.get(interaction.guild.id);
 
     if (!queue?.currentTrack) {
-      await interaction.reply({
-        embeds: [
-          errorEmbed("Không có bài đang phát", "Không có bài nào đang phát."),
-        ],
-        ephemeral: true,
-      });
+      await interaction.reply(
+        v2Payload(
+          errorContainer("Không có bài đang phát", "Không có bài nào đang phát."),
+          { ephemeral: true },
+        ),
+      );
       return;
     }
 
     queue.node.setVolume(level);
 
-    await interaction.reply({
-      embeds: [
-        successEmbed("Đã cập nhật âm lượng", `Âm lượng đặt ở **${level}**.`),
-      ],
-    });
+    await interaction.reply(
+      v2Payload(
+        successContainer("Đã cập nhật âm lượng", `Âm lượng đặt ở **${level}**.`),
+      ),
+    );
   },
 };

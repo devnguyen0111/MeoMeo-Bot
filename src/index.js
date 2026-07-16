@@ -11,6 +11,7 @@ import ffmpegStatic from "ffmpeg-static";
 import config from "../config/config.js";
 import logger from "./utils/logger.js";
 import CommandStats from "./models/CommandStats.js";
+import { errorContainer, v2Payload } from "./utils/componentsV2.js";
 
 dotenv.config();
 
@@ -71,11 +72,13 @@ client.player.events.on("playerError", (queue, error) => {
 
   const message = String(error?.message || error || "");
   const requiresAuth = message.toLowerCase().includes("signed in");
-  const content = requiresAuth
-    ? "❌ This track requires a signed-in YouTube session. Please try another song or add a cookie."
-    : "❌ Failed to play this track. Please try another song.";
+  const description = requiresAuth
+    ? "Bài này cần phiên YouTube đã đăng nhập. Hãy thử bài khác hoặc thêm cookie."
+    : "Không thể phát bài này. Hãy thử bài khác.";
 
-  channel.send({ content }).catch(() => {});
+  channel
+    .send(v2Payload(errorContainer("Phát nhạc thất bại", description)))
+    .catch(() => {});
 });
 
 client.player.events.on("error", (queue, error) => {

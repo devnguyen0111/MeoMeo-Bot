@@ -1,7 +1,11 @@
 import { SlashCommandBuilder } from "discord.js";
-import { customEmbed } from "../../utils/embed.js";
 import config from "../../../config/config.js";
 import { getWaifuImage } from "../../utils/waifuUtils.js";
+import {
+  errorContainer,
+  imageCardContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 
 const SFW_CATEGORIES = [
   "waifu",
@@ -78,17 +82,15 @@ export default {
     const type = interaction.options.getSubcommand();
     const category = interaction.options.getString("category");
 
-    // Validation for NSFW
     if (type === "nsfw" && !interaction.channel.nsfw) {
-      return interaction.editReply({
-        embeds: [
-          customEmbed({
-            title: "❌ Chỉ NSFW",
-            description: "Lệnh này chỉ dùng trong kênh NSFW!",
-            color: config.colors.error,
-          }),
-        ],
-      });
+      return interaction.editReply(
+        v2Payload(
+          errorContainer(
+            "Chỉ NSFW",
+            "Lệnh này chỉ dùng trong kênh NSFW!",
+          ),
+        ),
+      );
     }
 
     try {
@@ -98,26 +100,24 @@ export default {
         throw new Error("Failed to fetch image from API");
       }
 
-      const embed = customEmbed({
+      const container = imageCardContainer({
         title: `${type === "nsfw" ? "🔞 " : ""}${category.charAt(0).toUpperCase() + category.slice(1)}`,
-        image: imageUrl,
+        imageUrl,
         color: config.colors.primary,
-        footer: { text: `Cung cấp bởi API nguồn • ${type.toUpperCase()}` },
+        footer: `Cung cấp bởi API nguồn • ${type.toUpperCase()}`,
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await interaction.editReply(v2Payload(container));
     } catch (error) {
       console.error("Waifu command error:", error);
-      await interaction.editReply({
-        embeds: [
-          customEmbed({
-            title: "❌ Lỗi",
-            description:
-              "Không lấy được ảnh. Vui lòng kiểm tra danh mục hoặc thử lại sau.",
-            color: config.colors.error,
-          }),
-        ],
-      });
+      await interaction.editReply(
+        v2Payload(
+          errorContainer(
+            "Lỗi",
+            "Không lấy được ảnh. Vui lòng kiểm tra danh mục hoặc thử lại sau.",
+          ),
+        ),
+      );
     }
   },
 };

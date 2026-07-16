@@ -1,5 +1,9 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { successEmbed, errorEmbed } from "../../utils/embed.js";
+import {
+  errorContainer,
+  successContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -12,14 +16,13 @@ export default {
         .setDescription("The user to timeout")
         .setRequired(true),
     )
-    .addIntegerOption(
-      (option) =>
-        option
-          .setName("duration")
-          .setDescription("Timeout duration in minutes")
-          .setRequired(true)
-          .setMinValue(1)
-          .setMaxValue(40320), // 28 days max
+    .addIntegerOption((option) =>
+      option
+        .setName("duration")
+        .setDescription("Timeout duration in minutes")
+        .setRequired(true)
+        .setMinValue(1)
+        .setMaxValue(40320),
     )
     .addStringOption((option) =>
       option
@@ -34,53 +37,51 @@ export default {
     const reason = interaction.options.getString("reason") || "Không có lý do";
     const member = await interaction.guild.members.fetch(target.id);
 
-    // Check if user can be timed out
     if (!member.moderatable) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed(
+      return interaction.reply(
+        v2Payload(
+          errorContainer(
             "Không thể timeout",
             "Mình không có quyền timeout người này.",
           ),
-        ],
-        ephemeral: true,
-      });
+          { ephemeral: true },
+        ),
+      );
     }
 
     if (
       member.roles.highest.position >= interaction.member.roles.highest.position
     ) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed(
+      return interaction.reply(
+        v2Payload(
+          errorContainer(
             "Không thể timeout",
             "Bạn không thể timeout người này do thứ bậc role.",
           ),
-        ],
-        ephemeral: true,
-      });
+          { ephemeral: true },
+        ),
+      );
     }
 
-    // Perform timeout
     try {
       await member.timeout(duration * 60 * 1000, reason);
 
-      await interaction.reply({
-        embeds: [
-          successEmbed(
+      await interaction.reply(
+        v2Payload(
+          successContainer(
             "Đã timeout thành viên",
             `${target.tag} đã bị timeout ${duration} phút.\n**Lý do:** ${reason}`,
           ),
-        ],
-        ephemeral: true,
-      });
+          { ephemeral: true },
+        ),
+      );
     } catch (error) {
-      await interaction.reply({
-        embeds: [
-          errorEmbed("Lỗi", "Không thể timeout người dùng: " + error.message),
-        ],
-        ephemeral: true,
-      });
+      await interaction.reply(
+        v2Payload(
+          errorContainer("Lỗi", "Không thể timeout người dùng: " + error.message),
+          { ephemeral: true },
+        ),
+      );
     }
   },
 };

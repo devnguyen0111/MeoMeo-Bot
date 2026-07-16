@@ -1,7 +1,12 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { customEmbed, successEmbed, errorEmbed } from "../../utils/embed.js";
 import buttons from "../../components/buttons.js";
 import { awaitButton } from "../../utils/collectors.js";
+import {
+  cardContainer,
+  errorContainer,
+  successContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 import config from "../../../config/config.js";
 
 export default {
@@ -27,50 +32,44 @@ export default {
     const reason = interaction.options.getString("reason") || "Không có lý do";
     const member = await interaction.guild.members.fetch(target.id);
 
-    // Check if user can be kicked
     if (!member.kickable) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed("Không thể kick", "Mình không có quyền kick người này."),
-        ],
-        ephemeral: true,
-      });
+      return interaction.reply(
+        v2Payload(
+          errorContainer("Không thể kick", "Mình không có quyền kick người này."),
+          { ephemeral: true },
+        ),
+      );
     }
 
-    // Check role hierarchy
     if (
       member.roles.highest.position >= interaction.member.roles.highest.position
     ) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed(
+      return interaction.reply(
+        v2Payload(
+          errorContainer(
             "Không thể kick",
             "Bạn không thể kick người này do thứ bậc role.",
           ),
-        ],
-        ephemeral: true,
-      });
+          { ephemeral: true },
+        ),
+      );
     }
 
-    // Confirmation prompt
-    const confirmEmbed = customEmbed({
+    const confirmContainer = cardContainer({
       title: "⚠️ Xác nhận kick",
       description: `Bạn chắc muốn kick ${target.tag}?`,
       color: config.colors.warning,
+      thumbnailUrl: target.displayAvatarURL(),
       fields: [
         { name: "Người dùng", value: target.toString(), inline: true },
         { name: "Lý do", value: reason, inline: true },
       ],
-      thumbnail: target.displayAvatarURL(),
+      rows: [buttons.confirmation("kick")],
     });
 
-    const confirmButtons = buttons.confirmation("kick");
-
     const message = await interaction.reply({
-      embeds: [confirmEmbed],
-      components: [confirmButtons],
+      ...v2Payload(confirmContainer, { ephemeral: true }),
       fetchReply: true,
-      ephemeral: true,
     });
 
     const buttonInteraction = await awaitButton(
@@ -80,39 +79,36 @@ export default {
     );
 
     if (!buttonInteraction) {
-      return interaction.editReply({
-        embeds: [errorEmbed("Hết thời gian", "Đã hủy kick vì hết thời gian.")],
-        components: [],
-      });
+      return interaction.editReply(
+        v2Payload(
+          errorContainer("Hết thời gian", "Đã hủy kick vì hết thời gian."),
+        ),
+      );
     }
 
     if (buttonInteraction.customId === "kick_no") {
-      return buttonInteraction.update({
-        embeds: [errorEmbed("Đã hủy", "Đã hủy kick.")],
-        components: [],
-      });
+      return buttonInteraction.update(
+        v2Payload(errorContainer("Đã hủy", "Đã hủy kick.")),
+      );
     }
 
-    // Perform kick
     try {
       await member.kick(reason);
 
-      await buttonInteraction.update({
-        embeds: [
-          successEmbed(
+      await buttonInteraction.update(
+        v2Payload(
+          successContainer(
             "Đã kick thành viên",
             `${target.tag} đã bị kick khỏi máy chủ.\n**Lý do:** ${reason}`,
           ),
-        ],
-        components: [],
-      });
+        ),
+      );
     } catch (error) {
-      await buttonInteraction.update({
-        embeds: [
-          errorEmbed("Lỗi", "Không thể kick người dùng: " + error.message),
-        ],
-        components: [],
-      });
+      await buttonInteraction.update(
+        v2Payload(
+          errorContainer("Lỗi", "Không thể kick người dùng: " + error.message),
+        ),
+      );
     }
   },
 };

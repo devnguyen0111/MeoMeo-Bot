@@ -1,5 +1,9 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { successEmbed, errorEmbed } from "../../utils/embed.js";
+import {
+  errorContainer,
+  successContainer,
+  v2Payload,
+} from "../../utils/componentsV2.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -21,25 +25,25 @@ export default {
     try {
       const deleted = await interaction.channel.bulkDelete(amount, true);
 
-      await interaction.reply({
-        embeds: [
-          successEmbed(
+      await interaction.reply(
+        v2Payload(
+          successContainer(
             "Đã xóa tin nhắn",
             `Đã xóa thành công ${deleted.size} tin nhắn.`,
           ),
-        ],
-        ephemeral: true,
-      });
+          { ephemeral: true },
+        ),
+      );
     } catch (error) {
-      await interaction.reply({
-        embeds: [
-          errorEmbed(
+      await interaction.reply(
+        v2Payload(
+          errorContainer(
             "Lỗi",
             "Không thể xóa tin nhắn. Có thể chúng đã cũ hơn 14 ngày.",
           ),
-        ],
-        ephemeral: true,
-      });
+          { ephemeral: true },
+        ),
+      );
     }
   },
 };
